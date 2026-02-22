@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Ant Design overrides */
+.ant-layout {
+  background: #f0f2f5 !important;
+}
+
+.ant-card {
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #e8ecf1 !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+.ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.ant-table {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.ant-btn-primary {
+  box-shadow: 0 2px 4px rgba(22, 119, 255, 0.3) !important;
+}
+
+.ant-statistic-title {
+  font-size: 13px !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+.ant-statistic-content-value {
+  font-weight: 700 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .ant-table-wrapper {
+    overflow-x: auto !important;
+  }
+
+  .ant-table {
+    min-width: 600px !important;
+  }
+
+  .ant-card {
+    border-radius: 8px !important;
+  }
+
+  .ant-card-body {
+    padding: 12px !important;
+  }
+
+  .ant-modal {
+    max-width: calc(100vw - 32px) !important;
+    margin: 16px auto !important;
+  }
+
+  .ant-modal .ant-modal-content {
+    padding: 16px !important;
+  }
+
+  .ant-table-thead > tr > th {
+    font-size: 11px !important;
+    padding: 8px !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 8px !important;
+    font-size: 13px !important;
+  }
+
+  .ant-pagination {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+
+  .ant-pagination .ant-pagination-total-text {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 4px !important;
+  }
+}

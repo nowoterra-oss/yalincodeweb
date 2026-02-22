@@ -10,12 +10,13 @@ import { ApiService } from '@services/ApiService';
 
 // Custom Types 
 type Guid = string; 
-type Double = number;
-type Decimal = number;
-type Int64 = number;
-type Int32 = number;
-type int = number;
-type long = number;
+type Double = number; 
+type Decimal = number; 
+type DecimalNullable = number | null; 
+type Int64 = number; 
+type Int32 = number; 
+type int = number; 
+type long = number; 
 type __ERROR_TYPE_NOT_HANDLED__ = File;
 
 // Settings...

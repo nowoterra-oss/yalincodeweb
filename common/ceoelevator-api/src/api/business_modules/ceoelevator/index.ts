@@ -10,13 +10,14 @@ import { ApiService } from '@services/ApiService';
 
 // Custom Types 
 type Guid = string; 
-type Double = number;
-type Decimal = number;
-type Int64 = number;
-type Int32 = number;
-type int = number;
-type long = number;
-type __ERROR_TYPE_NOT_HANDLED__ = number;
+type Double = number; 
+type Decimal = number; 
+type DecimalNullable = number | null; 
+type Int64 = number; 
+type Int32 = number; 
+type int = number; 
+type long = number; 
+type __ERROR_TYPE_NOT_HANDLED__ = any;
 
 // Settings...
 
@@ -48,7 +49,7 @@ export namespace CeoElevatorAPI {
 			}
 			export interface IResponseModel {
 				id: Guid;
-				tenantId: number;
+				tenantId: Guid;
 				code: string;
 				companyName: string;
 				reference: string;
@@ -74,7 +75,6 @@ export namespace CeoElevatorAPI {
 			export const RequestPath = AppConfig.CeoElevatorUrl + '/Customers/All';
 			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
 			export interface IRequestModel {
-				tenantId: number;
 				sorting: IXSorting;
 				filters: IXFilterItem[];
 				pageRequest: IXPageRequest;
@@ -120,7 +120,6 @@ export namespace CeoElevatorAPI {
 			export const RequestPath = AppConfig.CeoElevatorUrl + '/Customers/Create';
 			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
 			export interface IRequestModel {
-				tenantId: number;
 				code: string;
 				companyName: string;
 				reference: string;
@@ -138,6 +137,23 @@ export namespace CeoElevatorAPI {
 			export interface IResponseModel {
 				id: Guid;
 				code: string;
+			}
+		}
+
+	}
+
+	export namespace Admin {
+
+		export namespace Health {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Admin/Health';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+			}
+			export interface IResponseModel {
+				status: string;
+				message: string;
+				timestamp: Date;
+				version: string;
 			}
 		}
 

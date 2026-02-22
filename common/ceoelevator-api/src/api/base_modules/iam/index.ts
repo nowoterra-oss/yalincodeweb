@@ -16,7 +16,8 @@ type DecimalNullable = number | null;
 type Int64 = number; 
 type Int32 = number; 
 type int = number; 
-type long = number;
+type long = number; 
+type __ERROR_TYPE_NOT_HANDLED__ = any;
 
 // Settings...
 
@@ -49,6 +50,22 @@ export namespace IAMAPI {
 			Mobile = 1,
 			Service = 2,
 			Unknown = 3,
+		}
+
+		export enum CeoElevatorModule {
+			None = 0,
+			Core = 1,
+			Sales = 2,
+			Inventory = 3,
+			Finance = 4,
+			Planning = 5,
+			Procurement = 6,
+			Installation = 7,
+			Warehouse = 8,
+			Engineering = 9,
+			Quality = 10,
+			Pricing = 11,
+			All = 12,
 		}
 
 	}
@@ -604,6 +621,43 @@ export namespace IAMAPI {
 				isCompanyHolding: boolean;
 				companyName: string;
 				isPhoneVerified: boolean;
+			}
+		}
+
+		export namespace CeoElevatorLogin {
+			export const RequestPath = AppConfig.IAMUrl + '/Auth/CeoElevatorLogin';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				tenantCode: string;
+				email: string;
+				password: string;
+				platform: Enums.ClientPlatforms;
+			}
+			export interface IResponseModel {
+				jwt: string;
+				refreshToken: string;
+				sessionExpirationDate: Date;
+				user: IUserResponse;
+				tenant: ITenantResponse;
+			}
+			export interface IUserResponse {
+				id: Guid;
+				email: string;
+				firstName: string;
+				lastName: string;
+				fullName: string;
+				role: string;
+				avatarUrl: string;
+				lastLoginAt?: Date;
+			}
+			export interface ITenantResponse {
+				id: Guid;
+				code: string;
+				companyName: string;
+				enabledModules: Enums.CeoElevatorModule;
+				moduleNames: string[];
+				licenseExpiryDate?: Date;
+				daysUntilExpiry: number;
 			}
 		}
 
