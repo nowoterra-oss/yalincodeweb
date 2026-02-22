@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
       key: 'profile',
       icon: <UserOutlined />,
       label: 'Profil',
-      onClick: () => navigate('/settings'),
+      onClick: () => navigate('/profile'),
     },
     {
       key: 'settings',

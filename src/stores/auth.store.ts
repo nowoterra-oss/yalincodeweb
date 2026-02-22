@@ -51,6 +51,7 @@ interface AuthActions {
   logout: () => void;
   initialize: () => void;
   clearError: () => void;
+  updateUser: (updates: Partial<TenantUser>) => void;
 }
 
 export const useAuthStore = create<AuthState & AuthActions>((set) => ({
@@ -135,4 +136,13 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  updateUser: (updates: Partial<TenantUser>) => {
+    set((state) => {
+      if (!state.user) return state;
+      const updatedUser = { ...state.user, ...updates };
+      localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+      return { user: updatedUser };
+    });
+  },
 }));

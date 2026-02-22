@@ -39,6 +39,59 @@ export namespace CeoElevatorAPI {
 
 	}
 
+	export namespace Profile {
+
+		export namespace Me {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Profile/Me';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+			}
+			export interface IResponseModel {
+				id: Guid;
+				email: string;
+				firstName: string;
+				lastName: string;
+				phone: string;
+				avatarUrl: string;
+				role: string;
+				lastLoginAt?: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Profile/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				firstName: string;
+				lastName: string;
+				phone: string;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				email: string;
+				firstName: string;
+				lastName: string;
+				phone: string;
+				avatarUrl: string;
+				role: string;
+			}
+		}
+
+		export namespace ChangePassword {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Profile/ChangePassword';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				currentPassword: string;
+				newPassword: string;
+			}
+			export interface IResponseModel {
+				success: boolean;
+				message: string;
+			}
+		}
+
+	}
+
 	export namespace Customers {
 
 		export namespace Detail {

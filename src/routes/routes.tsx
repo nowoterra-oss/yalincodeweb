@@ -4,6 +4,7 @@ import { PrivateRoute } from './PrivateRoute';
 import { Login } from '../pages/auth/Login';
 import { Dashboard } from '../pages/dashboard/Dashboard';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
+import { Profile } from '../pages/profile/Profile';
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +60,8 @@ export const router = createBrowserRouter([
       { path: 'field-work', element: <PlaceholderPage title="Saha Isleri" module="Installation" /> },
       // Pricing
       { path: 'pricing', element: <PlaceholderPage title="Fiyatlandirma" module="Pricing" /> },
+      // Profile
+      { path: 'profile', element: <Profile /> },
       // Settings
       { path: 'settings', element: <PlaceholderPage title="Ayarlar" /> },
     ],
