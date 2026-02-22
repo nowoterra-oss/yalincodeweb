@@ -654,6 +654,7 @@ export namespace IAMAPI {
 				id: Guid;
 				code: string;
 				companyName: string;
+				apiKey: string;
 				enabledModules: Enums.CeoElevatorModule;
 				moduleNames: string[];
 				licenseExpiryDate?: Date;
