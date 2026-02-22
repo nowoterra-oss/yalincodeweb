@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '@config/ceoelevator-config';
 import { AppConfig } from '@config/ceoelevator-config';
-import { TOKEN_KEY, REFRESH_TOKEN_KEY, USER_KEY, TENANT_KEY } from '../utils/constants';
+import { TOKEN_KEY, REFRESH_TOKEN_KEY, USER_KEY, TENANT_KEY, API_KEY } from '../utils/constants';
 
 export interface TenantUser {
   id: string;
@@ -102,6 +102,9 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
       localStorage.setItem(REFRESH_TOKEN_KEY, payload.refreshToken);
       localStorage.setItem(USER_KEY, JSON.stringify(payload.user));
       localStorage.setItem(TENANT_KEY, JSON.stringify(payload.tenant));
+      if (payload.tenant?.apiKey) {
+        localStorage.setItem(API_KEY, payload.tenant.apiKey);
+      }
 
       set({
         user: payload.user,
@@ -127,6 +130,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(TENANT_KEY);
+    localStorage.removeItem(API_KEY);
     set({
       user: null,
       tenant: null,

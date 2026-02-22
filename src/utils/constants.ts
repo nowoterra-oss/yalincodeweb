@@ -6,6 +6,7 @@ export const TOKEN_KEY = 'accessToken';
 export const REFRESH_TOKEN_KEY = 'refreshToken';
 export const USER_KEY = 'user';
 export const TENANT_KEY = 'tenant';
+export const API_KEY = 'apiKey';
 
 export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];

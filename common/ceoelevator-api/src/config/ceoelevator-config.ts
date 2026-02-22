@@ -28,6 +28,10 @@ api.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      const apiKey = localStorage.getItem('apiKey');
+      if (apiKey) {
+        config.headers['X-Api-Key'] = apiKey;
+      }
     }
 
     if (config.url && config.url.includes('/iam/')) {
