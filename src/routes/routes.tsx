@@ -5,6 +5,7 @@ import { Login } from '../pages/auth/Login';
 import { Dashboard } from '../pages/dashboard/Dashboard';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 import { Profile } from '../pages/profile/Profile';
+import { Settings } from '../pages/settings/Settings';
 
 export const router = createBrowserRouter([
   {
@@ -63,7 +64,7 @@ export const router = createBrowserRouter([
       // Profile
       { path: 'profile', element: <Profile /> },
       // Settings
-      { path: 'settings', element: <PlaceholderPage title="Ayarlar" /> },
+      { path: 'settings', element: <Settings /> },
     ],
   },
   {
