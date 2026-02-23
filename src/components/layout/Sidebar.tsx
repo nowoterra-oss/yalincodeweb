@@ -109,6 +109,8 @@ const moduleMenus: ModuleMenuConfig[] = [
       { key: '/pricing/materials', icon: <TagOutlined />, label: 'Malzemeler' },
       { key: '/pricing/products', icon: <TagOutlined />, label: 'Urunler' },
       { key: '/pricing/lookups', icon: <SettingOutlined />, label: 'Tanimlar' },
+      { key: '/pricing/supplier-prices', icon: <TagOutlined />, label: 'Tedarikci Fiyatlari' },
+      { key: '/pricing/price-rules', icon: <TagOutlined />, label: 'Fiyat Kurallari' },
     ],
   },
 ];

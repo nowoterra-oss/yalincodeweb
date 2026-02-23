@@ -11,6 +11,8 @@ import { MaterialsPage } from '../pages/pricing/MaterialsPage';
 import { ProductsPage } from '../pages/pricing/ProductsPage';
 import { ProductDetailPage } from '../pages/pricing/ProductDetailPage';
 import { LookupsPage } from '../pages/pricing/LookupsPage';
+import { SupplierPricesPage } from '../pages/pricing/SupplierPricesPage';
+import { PriceRulesPage } from '../pages/pricing/PriceRulesPage';
 
 export const router = createBrowserRouter([
   {
@@ -70,6 +72,8 @@ export const router = createBrowserRouter([
       { path: 'pricing/products', element: <ProductsPage /> },
       { path: 'pricing/products/:id', element: <ProductDetailPage /> },
       { path: 'pricing/lookups', element: <LookupsPage /> },
+      { path: 'pricing/supplier-prices', element: <SupplierPricesPage /> },
+      { path: 'pricing/price-rules', element: <PriceRulesPage /> },
       // Profile
       { path: 'profile', element: <Profile /> },
       // Settings
