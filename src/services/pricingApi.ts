@@ -275,50 +275,50 @@ export interface ProductVariantUpdateRequest {
 
 export const productGroupsApi = {
   getAll: (data?: ListRequest) =>
-    ApiService.call<ProductGroupListItem[]>(api.post(`${BASE}/Pricing/ProductGroups/All`, data || {})),
+    ApiService.call<ProductGroupListItem[]>(api.post(`${BASE}/ProductGroups/All`, data || {})),
   getDetail: (id: string) =>
-    ApiService.call<ProductGroupDetail>(api.post(`${BASE}/Pricing/ProductGroups/Detail`, { id })),
+    ApiService.call<ProductGroupDetail>(api.post(`${BASE}/ProductGroups/Detail`, { id })),
   create: (data: ProductGroupCreateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/ProductGroups/Create`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/ProductGroups/Create`, data)),
   update: (data: ProductGroupUpdateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/ProductGroups/Update`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/ProductGroups/Update`, data)),
   delete: (id: string) =>
-    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Pricing/ProductGroups/Delete`, { id })),
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/ProductGroups/Delete`, { id })),
 };
 
 export const materialsApi = {
   getAll: (data?: ListRequest) =>
-    ApiService.call<MaterialListItem[]>(api.post(`${BASE}/Pricing/Materials/All`, data || {})),
+    ApiService.call<MaterialListItem[]>(api.post(`${BASE}/Materials/All`, data || {})),
   getDetail: (id: string) =>
-    ApiService.call<MaterialDetail>(api.post(`${BASE}/Pricing/Materials/Detail`, { id })),
+    ApiService.call<MaterialDetail>(api.post(`${BASE}/Materials/Detail`, { id })),
   create: (data: MaterialCreateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/Materials/Create`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Materials/Create`, data)),
   update: (data: MaterialUpdateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/Materials/Update`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Materials/Update`, data)),
   delete: (id: string) =>
-    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Pricing/Materials/Delete`, { id })),
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Materials/Delete`, { id })),
 };
 
 export const productsApi = {
   getAll: (data?: ListRequest) =>
-    ApiService.call<ProductListItem[]>(api.post(`${BASE}/Pricing/Products/All`, data || {})),
+    ApiService.call<ProductListItem[]>(api.post(`${BASE}/Products/All`, data || {})),
   getDetail: (id: string) =>
-    ApiService.call<ProductDetail>(api.post(`${BASE}/Pricing/Products/Detail`, { id })),
+    ApiService.call<ProductDetail>(api.post(`${BASE}/Products/Detail`, { id })),
   create: (data: ProductCreateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/Products/Create`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Products/Create`, data)),
   update: (data: ProductUpdateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/Products/Update`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Products/Update`, data)),
   delete: (id: string) =>
-    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Pricing/Products/Delete`, { id })),
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Products/Delete`, { id })),
 };
 
 export const productVariantsApi = {
   create: (data: ProductVariantCreateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/ProductVariants/Create`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/ProductVariants/Create`, data)),
   update: (data: ProductVariantUpdateRequest) =>
-    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/ProductVariants/Update`, data)),
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/ProductVariants/Update`, data)),
   delete: (id: string) =>
-    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Pricing/ProductVariants/Delete`, { id })),
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/ProductVariants/Delete`, { id })),
 };
 
 export const lookupsApi = {
