@@ -228,13 +228,13 @@ export const ProductDetailPage: React.FC = () => {
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="code" label="Kod" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+          <Form.Item name="code" label="Kod" tooltip="Varyant kisa kodu (orn: paslanmaz, boyali, cam)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
             <Input placeholder="ornek: paslanmaz" />
           </Form.Item>
-          <Form.Item name="name" label="Ad" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+          <Form.Item name="name" label="Ad" tooltip="Varyant adi (orn: Paslanmaz Celik, Boyali, Camli)" rules={[{ required: true, message: 'Ad zorunludur' }]}>
             <Input placeholder="ornek: Paslanmaz Celik" />
           </Form.Item>
-          <Form.Item name="isDefault" valuePropName="checked">
+          <Form.Item name="isDefault" valuePropName="checked" tooltip="Teklif olusturulurken bu varyant otomatik secilir">
             <Checkbox>Varsayilan Varyant</Checkbox>
           </Form.Item>
           {editingVariant && (

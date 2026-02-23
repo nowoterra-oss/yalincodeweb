@@ -211,26 +211,26 @@ export const ProductsPage: React.FC = () => {
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="code" label="Kod" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+          <Form.Item name="code" label="Kod" tooltip="Urunun benzersiz kisa kodu (orn: CAB-800-GP)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
             <Input placeholder="ornek: CAB-800-GP" />
           </Form.Item>
-          <Form.Item name="name" label="Ad" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+          <Form.Item name="name" label="Ad" tooltip="Urunun kullaniciya gorunen adi" rules={[{ required: true, message: 'Ad zorunludur' }]}>
             <Input placeholder="ornek: 800mm Genis Panel Kabin" />
           </Form.Item>
-          <Form.Item name="description" label="Aciklama">
+          <Form.Item name="description" label="Aciklama" tooltip="Urun hakkinda detayli bilgi (istege bagli)">
             <Input.TextArea rows={2} placeholder="Urun aciklamasi" />
           </Form.Item>
-          <Form.Item name="productGroupId" label="Urun Grubu" rules={[{ required: true, message: 'Urun grubu zorunludur' }]}>
+          <Form.Item name="productGroupId" label="Urun Grubu" tooltip="Urunun ait oldugu fiyatlandirma grubu (orn: Kabinler, Motorlar)" rules={[{ required: true, message: 'Urun grubu zorunludur' }]}>
             <Select placeholder="Urun grubu secin">
               {groups.map((g) => (
                 <Select.Option key={g.id} value={g.id}>{g.name}</Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="isSubAssembly" valuePropName="checked">
+          <Form.Item name="isSubAssembly" valuePropName="checked" tooltip="Baska urunlerin icinde kullanilan bir yari mamul ise isaretleyin">
             <Checkbox>Alt Montaj</Checkbox>
           </Form.Item>
-          <Form.Item name="sortOrder" label="Siralama">
+          <Form.Item name="sortOrder" label="Siralama" tooltip="Listeleme sirasi (kucuk numara once gosterilir)">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
           {editing && (

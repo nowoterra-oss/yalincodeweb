@@ -244,44 +244,44 @@ export const MaterialsPage: React.FC = () => {
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="code" label="Kod" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+            <Form.Item name="code" label="Kod" tooltip="Malzemenin benzersiz stok kodu (orn: SAC-DKP-12)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
               <Input placeholder="ornek: SAC-DKP-12" />
             </Form.Item>
-            <Form.Item name="name" label="Ad" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+            <Form.Item name="name" label="Ad" tooltip="Malzemenin tanimlanabilir adi" rules={[{ required: true, message: 'Ad zorunludur' }]}>
               <Input placeholder="ornek: 1.2mm DKP Sac" />
             </Form.Item>
           </div>
-          <Form.Item name="description" label="Aciklama">
+          <Form.Item name="description" label="Aciklama" tooltip="Malzeme hakkinda ek detaylar (istege bagli)">
             <Input.TextArea rows={2} placeholder="Malzeme aciklamasi" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="category" label="Kategori" rules={[{ required: true }]}>
+            <Form.Item name="category" label="Kategori" tooltip="Malzemenin ait oldugu ana kategori (Sac, Profil, Boya, Iscilik vb.)" rules={[{ required: true }]}>
               <Select>
                 {Object.entries(MaterialCategoryLabels).map(([key, label]) => (
                   <Select.Option key={key} value={Number(key)}>{label}</Select.Option>
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item name="unit" label="Birim" rules={[{ required: true, message: 'Birim zorunludur' }]}>
+            <Form.Item name="unit" label="Birim" tooltip="Olcum birimi: kg, metre, metrekare, adet, saat veya takim" rules={[{ required: true, message: 'Birim zorunludur' }]}>
               <Select options={unitOptions} />
             </Form.Item>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="unitPrice" label="Birim Fiyat" rules={[{ required: true, message: 'Fiyat zorunludur' }]}>
+            <Form.Item name="unitPrice" label="Birim Fiyat" tooltip="1 birim malzemenin alis fiyati" rules={[{ required: true, message: 'Fiyat zorunludur' }]}>
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="currency" label="Para Birimi" rules={[{ required: true }]}>
+            <Form.Item name="currency" label="Para Birimi" tooltip="Fiyatin gecerli oldugu para birimi" rules={[{ required: true }]}>
               <Select options={currencyOptions} />
             </Form.Item>
           </div>
-          <Form.Item name="supplier" label="Tedarikci">
+          <Form.Item name="supplier" label="Tedarikci" tooltip="Bu malzemeyi temin ettiginiz firma/kisi">
             <Input placeholder="Tedarikci adi" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="minOrderQuantity" label="Min. Siparis Miktari">
+            <Form.Item name="minOrderQuantity" label="Min. Siparis Miktari" tooltip="Tedarikciden siparis edilebilecek en dusuk miktar">
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="leadTimeDays" label="Tedarik Suresi (Gun)">
+            <Form.Item name="leadTimeDays" label="Tedarik Suresi (Gun)" tooltip="Siparis verdikten sonra malzemenin teslim suresi">
               <InputNumber min={0} precision={0} style={{ width: '100%' }} />
             </Form.Item>
           </div>

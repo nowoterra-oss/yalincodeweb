@@ -232,28 +232,28 @@ export const ProductGroupsPage: React.FC = () => {
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="code" label="Kod" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+          <Form.Item name="code" label="Kod" tooltip="Grubun benzersiz kisa kodu (orn: cabins, doors)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
             <Input placeholder="ornek: cabins" />
           </Form.Item>
-          <Form.Item name="name" label="Ad" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+          <Form.Item name="name" label="Ad" tooltip="Grubun kullaniciya gorunen adi" rules={[{ required: true, message: 'Ad zorunludur' }]}>
             <Input placeholder="ornek: Kabinler" />
           </Form.Item>
-          <Form.Item name="description" label="Aciklama">
+          <Form.Item name="description" label="Aciklama" tooltip="Grubun detayli aciklamasi (istege bagli)">
             <Input.TextArea rows={2} placeholder="Grup aciklamasi" />
           </Form.Item>
-          <Form.Item name="icon" label="Icon">
+          <Form.Item name="icon" label="Icon" tooltip="Grubu temsil eden emoji veya icon adi">
             <Input placeholder="ornek: 🏗️ veya icon adi" />
           </Form.Item>
-          <Form.Item name="pricingType" label="Fiyatlandirma Tipi" rules={[{ required: true }]}>
+          <Form.Item name="pricingType" label="Fiyatlandirma Tipi" tooltip="BOM: malzeme kirimlariyla maliyet hesabi. Tedarikci: direkt fiyat girisi" rules={[{ required: true }]}>
             <Select>
               <Select.Option value={PricingType.BOM}>BOM (Malzeme Kirimlari)</Select.Option>
               <Select.Option value={PricingType.SupplierPrice}>Tedarikci Fiyati</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item name="defaultProfitMargin" label="Kar Marji (%)" rules={[{ required: true, message: 'Kar marji zorunludur' }]}>
+          <Form.Item name="defaultProfitMargin" label="Kar Marji (%)" tooltip="Satis fiyatina eklenecek varsayilan kar orani" rules={[{ required: true, message: 'Kar marji zorunludur' }]}>
             <InputNumber min={0} max={100} addonAfter="%" style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item name="sortOrder" label="Siralama">
+          <Form.Item name="sortOrder" label="Siralama" tooltip="Listeleme sirasi (kucuk numara once gosterilir)">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
           {editing && (
