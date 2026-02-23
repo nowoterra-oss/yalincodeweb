@@ -252,6 +252,167 @@ export interface ProductUpdateRequest {
   isActive: boolean;
 }
 
+// --- BomLine Types ---
+
+export interface BomLineListItem {
+  id: string;
+  productVariantId: string;
+  materialId: string | null;
+  materialName: string | null;
+  materialCode: string | null;
+  materialUnit: string | null;
+  materialUnitPrice: number | null;
+  materialCurrency: string | null;
+  childProductVariantId: string | null;
+  childProductVariantName: string | null;
+  label: string | null;
+  quantity: number;
+  unit: string | null;
+  unitPriceOverride: number | null;
+  currencyOverride: string | null;
+  wastePercent: number | null;
+  notes: string | null;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface BomLineCreateRequest {
+  productVariantId: string;
+  materialId?: string;
+  childProductVariantId?: string;
+  label?: string;
+  quantity: number;
+  unit?: string;
+  unitPriceOverride?: number;
+  currencyOverride?: string;
+  wastePercent?: number;
+  notes?: string;
+  sortOrder: number;
+}
+
+export interface BomLineUpdateRequest {
+  id: string;
+  materialId?: string;
+  childProductVariantId?: string;
+  label?: string;
+  quantity: number;
+  unit?: string;
+  unitPriceOverride?: number;
+  currencyOverride?: string;
+  wastePercent?: number;
+  notes?: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface CostBreakdownItem {
+  bomLineId: string;
+  label: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  currency: string;
+  wastePercent: number;
+  lineCost: number;
+  isChildAssembly: boolean;
+}
+
+export interface CostCalculationResult {
+  totalCost: number;
+  currency: string;
+  breakdown: CostBreakdownItem[];
+}
+
+// --- SupplierPrice Types ---
+
+export interface SupplierPriceListItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productCode: string;
+  brand: string | null;
+  supplierName: string | null;
+  price: number;
+  currency: string;
+  discountRate: number;
+  conditions: string | null;
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  priceUpdatedAt: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface SupplierPriceCreateRequest {
+  productId: string;
+  brand?: string;
+  supplierName?: string;
+  price: number;
+  currency: string;
+  discountRate: number;
+  conditions?: string;
+  effectiveFrom: string;
+  effectiveTo?: string;
+}
+
+export interface SupplierPriceUpdateRequest {
+  id: string;
+  productId: string;
+  brand?: string;
+  supplierName?: string;
+  price: number;
+  currency: string;
+  discountRate: number;
+  conditions?: string;
+  effectiveFrom: string;
+  effectiveTo?: string;
+  isActive: boolean;
+}
+
+// --- PriceRule Types ---
+
+export enum PriceRuleType {
+  Discount = 0,
+  Markup = 1,
+  Override = 2,
+}
+
+export interface PriceRuleListItem {
+  id: string;
+  productGroupId: string | null;
+  productGroupName: string | null;
+  name: string;
+  ruleType: number;
+  matchCondition: string;
+  values: string;
+  variantField: string | null;
+  priority: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface PriceRuleCreateRequest {
+  productGroupId?: string;
+  name: string;
+  ruleType: number;
+  matchCondition: string;
+  values: string;
+  variantField?: string;
+  priority: number;
+}
+
+export interface PriceRuleUpdateRequest {
+  id: string;
+  productGroupId?: string;
+  name: string;
+  ruleType: number;
+  matchCondition: string;
+  values: string;
+  variantField?: string;
+  priority: number;
+  isActive: boolean;
+}
+
 // --- ProductVariant Types ---
 
 export interface ProductVariantCreateRequest {
@@ -330,4 +491,39 @@ export const lookupsApi = {
     ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Lookups/Update`, data)),
   delete: (id: string) =>
     ApiService.call<{ success: boolean }>(api.post(`${BASE}/Lookups/Delete`, { id })),
+};
+
+export const bomLinesApi = {
+  getAll: (data: { productVariantId: string } & Partial<ListRequest>) =>
+    ApiService.call<BomLineListItem[]>(api.post(`${BASE}/BomLines/All`, data)),
+  create: (data: BomLineCreateRequest) =>
+    ApiService.call<{ id: string; sortOrder: number }>(api.post(`${BASE}/BomLines/Create`, data)),
+  update: (data: BomLineUpdateRequest) =>
+    ApiService.call<{ id: string; sortOrder: number }>(api.post(`${BASE}/BomLines/Update`, data)),
+  delete: (id: string) =>
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/BomLines/Delete`, { id })),
+  calculateCost: (productVariantId: string) =>
+    ApiService.call<CostCalculationResult>(api.post(`${BASE}/BomLines/CalculateCost`, { productVariantId })),
+};
+
+export const supplierPricesApi = {
+  getAll: (data?: { productId?: string } & Partial<ListRequest>) =>
+    ApiService.call<SupplierPriceListItem[]>(api.post(`${BASE}/SupplierPrices/All`, data || {})),
+  create: (data: SupplierPriceCreateRequest) =>
+    ApiService.call<{ id: string }>(api.post(`${BASE}/SupplierPrices/Create`, data)),
+  update: (data: SupplierPriceUpdateRequest) =>
+    ApiService.call<{ id: string }>(api.post(`${BASE}/SupplierPrices/Update`, data)),
+  delete: (id: string) =>
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/SupplierPrices/Delete`, { id })),
+};
+
+export const priceRulesApi = {
+  getAll: (data?: { productGroupId?: string } & Partial<ListRequest>) =>
+    ApiService.call<PriceRuleListItem[]>(api.post(`${BASE}/PriceRules/All`, data || {})),
+  create: (data: PriceRuleCreateRequest) =>
+    ApiService.call<{ id: string; name: string }>(api.post(`${BASE}/PriceRules/Create`, data)),
+  update: (data: PriceRuleUpdateRequest) =>
+    ApiService.call<{ id: string; name: string }>(api.post(`${BASE}/PriceRules/Update`, data)),
+  delete: (id: string) =>
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/PriceRules/Delete`, { id })),
 };

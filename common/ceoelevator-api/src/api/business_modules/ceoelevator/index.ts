@@ -44,6 +44,109 @@ export namespace CeoElevatorAPI {
 
 	}
 
+	export namespace SupplierPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/SupplierPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productId?: Guid;
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				productId: Guid;
+				productName: string;
+				productCode: string;
+				brand: string;
+				supplierName: string;
+				price: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				conditions: string;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				priceUpdatedAt: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/SupplierPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				productId: Guid;
+				brand: string;
+				supplierName: string;
+				price: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				conditions: string;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/SupplierPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/SupplierPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productId: Guid;
+				brand: string;
+				supplierName: string;
+				price: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				conditions: string;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
 	export namespace Profile {
 
 		export namespace Me {
@@ -392,6 +495,103 @@ export namespace CeoElevatorAPI {
 
 	}
 
+	export namespace PriceRules {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceRules/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productGroupId?: Guid;
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				productGroupId?: Guid;
+				productGroupName: string;
+				name: string;
+				ruleType: number;
+				matchCondition: string;
+				values: string;
+				variantField: string;
+				priority: number;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceRules/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				productGroupId?: Guid;
+				name: string;
+				ruleType: number;
+				matchCondition: string;
+				values: string;
+				variantField: string;
+				priority: number;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				name: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceRules/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceRules/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productGroupId?: Guid;
+				name: string;
+				ruleType: number;
+				matchCondition: string;
+				values: string;
+				variantField: string;
+				priority: number;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				name: string;
+			}
+		}
+
+	}
+
 	export namespace Materials {
 
 		export namespace Detail {
@@ -686,6 +886,142 @@ export namespace CeoElevatorAPI {
 			export interface IResponseModel {
 				id: Guid;
 				code: string;
+			}
+		}
+
+	}
+
+	export namespace BomLines {
+
+		export namespace CalculateCost {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BomLines/CalculateCost';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productVariantId: Guid;
+			}
+			export interface IResponseModel {
+				totalCost: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				breakdown: IBreakdownItem[];
+			}
+			export interface IBreakdownItem {
+				bomLineId: Guid;
+				label: string;
+				quantity: __ERROR_TYPE_NOT_HANDLED__;
+				unit: string;
+				unitPrice: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				wastePercent: __ERROR_TYPE_NOT_HANDLED__;
+				lineCost: __ERROR_TYPE_NOT_HANDLED__;
+				isChildAssembly: boolean;
+			}
+		}
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BomLines/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productVariantId: Guid;
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				productVariantId: Guid;
+				materialId?: Guid;
+				materialName: string;
+				materialCode: string;
+				materialUnit: string;
+				materialUnitPrice?: __ERROR_TYPE_NOT_HANDLED__;
+				materialCurrency: string;
+				childProductVariantId?: Guid;
+				childProductVariantName: string;
+				label: string;
+				quantity: __ERROR_TYPE_NOT_HANDLED__;
+				unit: string;
+				unitPriceOverride?: __ERROR_TYPE_NOT_HANDLED__;
+				currencyOverride: string;
+				wastePercent?: __ERROR_TYPE_NOT_HANDLED__;
+				notes: string;
+				sortOrder: number;
+				isActive: boolean;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BomLines/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				materialId?: Guid;
+				childProductVariantId?: Guid;
+				label: string;
+				quantity: __ERROR_TYPE_NOT_HANDLED__;
+				unit: string;
+				unitPriceOverride?: __ERROR_TYPE_NOT_HANDLED__;
+				currencyOverride: string;
+				wastePercent?: __ERROR_TYPE_NOT_HANDLED__;
+				notes: string;
+				sortOrder: number;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				sortOrder: number;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BomLines/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BomLines/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productVariantId: Guid;
+				materialId?: Guid;
+				childProductVariantId?: Guid;
+				label: string;
+				quantity: __ERROR_TYPE_NOT_HANDLED__;
+				unit: string;
+				unitPriceOverride?: __ERROR_TYPE_NOT_HANDLED__;
+				currencyOverride: string;
+				wastePercent?: __ERROR_TYPE_NOT_HANDLED__;
+				notes: string;
+				sortOrder: number;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				sortOrder: number;
 			}
 		}
 
