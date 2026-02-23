@@ -6,6 +6,10 @@ import { Dashboard } from '../pages/dashboard/Dashboard';
 import { PlaceholderPage } from '../pages/PlaceholderPage';
 import { Profile } from '../pages/profile/Profile';
 import { Settings } from '../pages/settings/Settings';
+import { ProductGroupsPage } from '../pages/pricing/ProductGroupsPage';
+import { MaterialsPage } from '../pages/pricing/MaterialsPage';
+import { ProductsPage } from '../pages/pricing/ProductsPage';
+import { ProductDetailPage } from '../pages/pricing/ProductDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -60,7 +64,10 @@ export const router = createBrowserRouter([
       { path: 'installations', element: <PlaceholderPage title="Montaj" module="Installation" /> },
       { path: 'field-work', element: <PlaceholderPage title="Saha Isleri" module="Installation" /> },
       // Pricing
-      { path: 'pricing', element: <PlaceholderPage title="Fiyatlandirma" module="Pricing" /> },
+      { path: 'pricing/product-groups', element: <ProductGroupsPage /> },
+      { path: 'pricing/materials', element: <MaterialsPage /> },
+      { path: 'pricing/products', element: <ProductsPage /> },
+      { path: 'pricing/products/:id', element: <ProductDetailPage /> },
       // Profile
       { path: 'profile', element: <Profile /> },
       // Settings

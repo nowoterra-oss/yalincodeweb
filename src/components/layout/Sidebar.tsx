@@ -105,7 +105,9 @@ const moduleMenus: ModuleMenuConfig[] = [
   {
     module: 'Pricing',
     items: [
-      { key: '/pricing', icon: <TagOutlined />, label: 'Fiyatlandirma' },
+      { key: '/pricing/product-groups', icon: <TagOutlined />, label: 'Urun Gruplari' },
+      { key: '/pricing/materials', icon: <TagOutlined />, label: 'Malzemeler' },
+      { key: '/pricing/products', icon: <TagOutlined />, label: 'Urunler' },
     ],
   },
 ];
@@ -204,7 +206,10 @@ export const Sidebar: React.FC = () => {
     }
   };
 
-  const selectedKey = '/' + location.pathname.split('/')[1];
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const selectedKey = pathParts.length >= 2 && pathParts[0] === 'pricing'
+    ? '/' + pathParts[0] + '/' + pathParts[1]
+    : '/' + (pathParts[0] || '');
 
   if (isMobile) {
     return (
