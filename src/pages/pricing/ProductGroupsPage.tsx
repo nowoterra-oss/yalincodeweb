@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, message, Switch } from 'antd';
+import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Alert, message, Switch } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { PageHeader } from '../../components/common/PageHeader';
 import { formatDate } from '../../utils/formatters';
@@ -211,6 +211,23 @@ export const ProductGroupsPage: React.FC = () => {
   return (
     <>
       <PageHeader title="Urun Gruplari" subtitle="Fiyatlandirma urun gruplarini yonetin" showAdd addText="Yeni Grup" onAdd={openCreate} />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Urun gruplari nasil calisir?"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li><b>Urun grubu</b>, benzer urunlerin toplandigi kategoridir (orn: Kabinler, Motorlar, Kapilar).</li>
+            <li><b>BOM tipi</b> gruplarda fiyat, malzeme kirimlari (BOM) uzerinden alttan uste hesaplanir.</li>
+            <li><b>Tedarikci Fiyati</b> tipinde ise fiyat dogrudan tedarikci teklifinden girilir.</li>
+            <li><b>Kar Marji</b>, maliyet uzerine eklenen varsayilan kar oranini belirler.</li>
+            <li>Mor <b>"Sistem"</b> etiketli gruplar seed data'dir ve silinemez; duzenlenebilir.</li>
+          </ul>
+        }
+      />
 
       <Table
         columns={columns}

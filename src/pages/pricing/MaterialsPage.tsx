@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, message, Switch } from 'antd';
+import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Alert, message, Switch } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { PageHeader } from '../../components/common/PageHeader';
 import { formatDate, formatCurrency } from '../../utils/formatters';
@@ -221,6 +221,23 @@ export const MaterialsPage: React.FC = () => {
   return (
     <>
       <PageHeader title="Malzemeler" subtitle="Malzeme ve birim fiyatlarini yonetin" showAdd addText="Yeni Malzeme" onAdd={openCreate} />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Malzemeler nasil calisir?"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li><b>Malzemeler</b>, urunlerin BOM (malzeme listesi) satirlarinda kullanilan hammadde ve isciliklerdir.</li>
+            <li>Her malzemenin <b>birim fiyati</b> ve <b>para birimi</b> vardir; BOM hesaplamasinda bu fiyat kullanilir.</li>
+            <li><b>Kategori</b> secimi malzemeleri gruplar: Sac, Profil, Boya, Iscilik, Fason vb.</li>
+            <li><b>Tedarikci</b> ve <b>tedarik suresi</b> bilgileri satin alma planlamasi icindir.</li>
+            <li>Fiyat degistiginde <b>"Fiyat Guncelleme"</b> tarihi otomatik guncellenir.</li>
+          </ul>
+        }
+      />
 
       <Table
         columns={columns}

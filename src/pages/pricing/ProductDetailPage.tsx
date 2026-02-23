@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Tag, Modal, Form, Input, Checkbox, Space, Button, Descriptions, Spin, message, Switch } from 'antd';
+import { Card, Table, Tag, Modal, Form, Input, Checkbox, Space, Button, Descriptions, Spin, Alert, message, Switch } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
@@ -182,6 +182,22 @@ export const ProductDetailPage: React.FC = () => {
         showAdd
         addText="Varyant Ekle"
         onAdd={openCreateVariant}
+      />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Urun detayi ve varyantlar"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li><b>Varyant</b>, ayni urunun farkli versiyonlarini temsil eder (orn: paslanmaz, boyali, camli kabin).</li>
+            <li>Her varyanta ayri <b>BOM (malzeme listesi)</b> tanimlanabilir; maliyet varyant bazinda hesaplanir.</li>
+            <li><b>Varsayilan varyant</b>, teklif olusturulurken otomatik secilen versiyondur.</li>
+            <li><b>Hesaplanan Maliyet</b> kolonu, BOM satirlari girildikten sonra otomatik dolacaktir.</li>
+          </ul>
+        }
       />
 
       <Card style={{ marginBottom: 24 }}>

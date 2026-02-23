@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Checkbox, message, Switch } from 'antd';
+import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Checkbox, Alert, message, Switch } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
@@ -186,6 +186,23 @@ export const ProductsPage: React.FC = () => {
   return (
     <>
       <PageHeader title="Urunler" subtitle="Urun tanimlarini yonetin" showAdd addText="Yeni Urun" onAdd={openCreate} />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Urunler nasil calisir?"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li><b>Urun</b>, bir urun grubuna ait somut bir kalemi temsil eder (orn: "800mm Genis Panel Kabin").</li>
+            <li>Her urun bir <b>urun grubuna</b> baglidir; grubun fiyatlandirma tipi (BOM/Tedarikci) urune de uygulanir.</li>
+            <li><b>Alt Montaj</b> isaretli urunler baska urunlerin BOM'unda parca olarak kullanilabilir.</li>
+            <li>Detaya gitmek icin satirdaki <b>goz ikonuna</b> tiklayin veya satira <b>cift tiklayin</b>.</li>
+            <li>Detay sayfasinda urunun <b>varyantlarini</b> (orn: paslanmaz, boyali, camli) yonetebilirsiniz.</li>
+          </ul>
+        }
+      />
 
       <Table
         columns={columns}
