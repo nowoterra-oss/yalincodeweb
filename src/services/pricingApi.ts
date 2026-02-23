@@ -15,33 +15,38 @@ export const PricingTypeLabels: Record<PricingType, string> = {
   [PricingType.SupplierPrice]: 'Tedarikci Fiyati',
 };
 
-export enum MaterialCategory {
-  Sheet = 0,
-  Profile = 1,
-  Paint = 2,
-  Fastener = 3,
-  Electrical = 4,
-  Rubber = 5,
-  Glass = 6,
-  Wood = 7,
-  Labor = 8,
-  Subcontract = 9,
-  Other = 10,
+// --- Lookup Types ---
+
+export interface LookupValue {
+  id: string;
+  category: string;
+  code: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  sortOrder: number;
+  isSystem: boolean;
+  isActive: boolean;
 }
 
-export const MaterialCategoryLabels: Record<MaterialCategory, string> = {
-  [MaterialCategory.Sheet]: 'Sac',
-  [MaterialCategory.Profile]: 'Profil',
-  [MaterialCategory.Paint]: 'Boya',
-  [MaterialCategory.Fastener]: 'Baglanti',
-  [MaterialCategory.Electrical]: 'Elektrik',
-  [MaterialCategory.Rubber]: 'Lastik/Conta',
-  [MaterialCategory.Glass]: 'Cam',
-  [MaterialCategory.Wood]: 'Ahsap',
-  [MaterialCategory.Labor]: 'Iscilik',
-  [MaterialCategory.Subcontract]: 'Fason',
-  [MaterialCategory.Other]: 'Diger',
-};
+export interface LookupCreateRequest {
+  category: string;
+  code: string;
+  name: string;
+  description?: string;
+  color?: string;
+  sortOrder: number;
+}
+
+export interface LookupUpdateRequest {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  color?: string;
+  sortOrder: number;
+  isActive: boolean;
+}
 
 // --- Common Types ---
 
@@ -127,7 +132,7 @@ export interface MaterialListItem {
   id: string;
   code: string;
   name: string;
-  category: MaterialCategory;
+  category: string;
   unit: string;
   unitPrice: number;
   currency: string;
@@ -142,7 +147,7 @@ export interface MaterialDetail {
   code: string;
   name: string;
   description: string | null;
-  category: MaterialCategory;
+  category: string;
   unit: string;
   unitPrice: number;
   currency: string;
@@ -159,7 +164,7 @@ export interface MaterialCreateRequest {
   code: string;
   name: string;
   description?: string;
-  category: MaterialCategory;
+  category: string;
   unit: string;
   unitPrice: number;
   currency: string;
@@ -173,7 +178,7 @@ export interface MaterialUpdateRequest {
   code: string;
   name: string;
   description?: string;
-  category: MaterialCategory;
+  category: string;
   unit: string;
   unitPrice: number;
   currency: string;
@@ -314,4 +319,15 @@ export const productVariantsApi = {
     ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Pricing/ProductVariants/Update`, data)),
   delete: (id: string) =>
     ApiService.call<{ success: boolean }>(api.post(`${BASE}/Pricing/ProductVariants/Delete`, { id })),
+};
+
+export const lookupsApi = {
+  getByCategory: (category: string) =>
+    ApiService.call<LookupValue[]>(api.post(`${BASE}/Lookups/ByCategory`, { category })),
+  create: (data: LookupCreateRequest) =>
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Lookups/Create`, data)),
+  update: (data: LookupUpdateRequest) =>
+    ApiService.call<{ id: string; code: string }>(api.post(`${BASE}/Lookups/Update`, data)),
+  delete: (id: string) =>
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/Lookups/Delete`, { id })),
 };

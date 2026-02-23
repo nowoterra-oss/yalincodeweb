@@ -10,6 +10,7 @@ import { ProductGroupsPage } from '../pages/pricing/ProductGroupsPage';
 import { MaterialsPage } from '../pages/pricing/MaterialsPage';
 import { ProductsPage } from '../pages/pricing/ProductsPage';
 import { ProductDetailPage } from '../pages/pricing/ProductDetailPage';
+import { LookupsPage } from '../pages/pricing/LookupsPage';
 
 export const router = createBrowserRouter([
   {
@@ -68,6 +69,7 @@ export const router = createBrowserRouter([
       { path: 'pricing/materials', element: <MaterialsPage /> },
       { path: 'pricing/products', element: <ProductsPage /> },
       { path: 'pricing/products/:id', element: <ProductDetailPage /> },
+      { path: 'pricing/lookups', element: <LookupsPage /> },
       // Profile
       { path: 'profile', element: <Profile /> },
       // Settings

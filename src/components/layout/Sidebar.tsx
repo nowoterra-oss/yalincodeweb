@@ -108,6 +108,7 @@ const moduleMenus: ModuleMenuConfig[] = [
       { key: '/pricing/product-groups', icon: <TagOutlined />, label: 'Urun Gruplari' },
       { key: '/pricing/materials', icon: <TagOutlined />, label: 'Malzemeler' },
       { key: '/pricing/products', icon: <TagOutlined />, label: 'Urunler' },
+      { key: '/pricing/lookups', icon: <SettingOutlined />, label: 'Tanimlar' },
     ],
   },
 ];

@@ -5,40 +5,11 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 import {
   materialsApi,
-  MaterialCategory,
-  MaterialCategoryLabels,
+  lookupsApi,
   type MaterialListItem,
   type MaterialDetail,
+  type LookupValue,
 } from '../../services/pricingApi';
-
-const unitOptions = [
-  { value: 'kg', label: 'kg' },
-  { value: 'm', label: 'm' },
-  { value: 'm2', label: 'm\u00B2' },
-  { value: 'adet', label: 'Adet' },
-  { value: 'saat', label: 'Saat' },
-  { value: 'takim', label: 'Takim' },
-];
-
-const currencyOptions = [
-  { value: 'TRY', label: 'TRY' },
-  { value: 'EUR', label: 'EUR' },
-  { value: 'USD', label: 'USD' },
-];
-
-const categoryColors: Record<MaterialCategory, string> = {
-  [MaterialCategory.Sheet]: 'blue',
-  [MaterialCategory.Profile]: 'cyan',
-  [MaterialCategory.Paint]: 'orange',
-  [MaterialCategory.Fastener]: 'geekblue',
-  [MaterialCategory.Electrical]: 'gold',
-  [MaterialCategory.Rubber]: 'volcano',
-  [MaterialCategory.Glass]: 'lime',
-  [MaterialCategory.Wood]: 'brown',
-  [MaterialCategory.Labor]: 'purple',
-  [MaterialCategory.Subcontract]: 'magenta',
-  [MaterialCategory.Other]: 'default',
-};
 
 export const MaterialsPage: React.FC = () => {
   const [data, setData] = useState<MaterialListItem[]>([]);
@@ -47,6 +18,11 @@ export const MaterialsPage: React.FC = () => {
   const [editing, setEditing] = useState<MaterialDetail | null>(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+
+  // Dynamic lookups
+  const [categories, setCategories] = useState<LookupValue[]>([]);
+  const [units, setUnits] = useState<LookupValue[]>([]);
+  const [currencies, setCurrencies] = useState<LookupValue[]>([]);
 
   const loadData = async () => {
     try {
@@ -60,14 +36,34 @@ export const MaterialsPage: React.FC = () => {
     }
   };
 
+  const loadLookups = async () => {
+    try {
+      const [cats, uns, curs] = await Promise.all([
+        lookupsApi.getByCategory('MaterialCategory'),
+        lookupsApi.getByCategory('Unit'),
+        lookupsApi.getByCategory('Currency'),
+      ]);
+      setCategories(cats);
+      setUnits(uns);
+      setCurrencies(curs);
+    } catch (err: any) {
+      console.warn('Lookup verileri yuklenemedi:', err?.message);
+    }
+  };
+
   useEffect(() => {
     loadData();
+    loadLookups();
   }, []);
+
+  // Lookup helpers
+  const getCategoryLabel = (code: string) => categories.find(c => c.code === code)?.name || code;
+  const getCategoryColor = (code: string) => categories.find(c => c.code === code)?.color || 'default';
 
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ category: MaterialCategory.Sheet, unit: 'kg', currency: 'TRY', unitPrice: 0 });
+    form.setFieldsValue({ category: 'Sheet', unit: 'kg', currency: 'TRY', unitPrice: 0 });
     setModalOpen(true);
   };
 
@@ -173,8 +169,8 @@ export const MaterialsPage: React.FC = () => {
       dataIndex: 'category',
       key: 'category',
       width: 120,
-      render: (val: MaterialCategory) => (
-        <Tag color={categoryColors[val] || 'default'}>{MaterialCategoryLabels[val]}</Tag>
+      render: (val: string) => (
+        <Tag color={getCategoryColor(val)}>{getCategoryLabel(val)}</Tag>
       ),
     },
     { title: 'Birim', dataIndex: 'unit', key: 'unit', width: 70 },
@@ -274,13 +270,17 @@ export const MaterialsPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
             <Form.Item name="category" label="Kategori" tooltip="Malzemenin ait oldugu ana kategori (Sac, Profil, Boya, Iscilik vb.)" rules={[{ required: true }]}>
               <Select>
-                {Object.entries(MaterialCategoryLabels).map(([key, label]) => (
-                  <Select.Option key={key} value={Number(key)}>{label}</Select.Option>
+                {categories.filter(c => c.isActive).map(c => (
+                  <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
                 ))}
               </Select>
             </Form.Item>
             <Form.Item name="unit" label="Birim" tooltip="Olcum birimi: kg, metre, metrekare, adet, saat veya takim" rules={[{ required: true, message: 'Birim zorunludur' }]}>
-              <Select options={unitOptions} />
+              <Select>
+                {units.filter(u => u.isActive).map(u => (
+                  <Select.Option key={u.code} value={u.code}>{u.name}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
@@ -288,7 +288,11 @@ export const MaterialsPage: React.FC = () => {
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
             <Form.Item name="currency" label="Para Birimi" tooltip="Fiyatin gecerli oldugu para birimi" rules={[{ required: true }]}>
-              <Select options={currencyOptions} />
+              <Select>
+                {currencies.filter(c => c.isActive).map(c => (
+                  <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           </div>
           <Form.Item name="supplier" label="Tedarikci" tooltip="Bu malzemeyi temin ettiginiz firma/kisi">

@@ -25,16 +25,21 @@ export namespace CeoElevatorAPI {
 
 	export namespace Enums {
 
+		export enum XSortingDirection {
+			Ascending = 0,
+			Descending = 1,
+		}
+
+		export enum PricingType {
+			BOM = 0,
+			SupplierPrice = 1,
+		}
+
 		export enum CustomerType {
 			Contractor = 0,
 			Investor = 1,
 			Dealer = 2,
 			Individual = 3,
-		}
-
-		export enum XSortingDirection {
-			Ascending = 0,
-			Descending = 1,
 		}
 
 	}
@@ -87,6 +92,497 @@ export namespace CeoElevatorAPI {
 			export interface IResponseModel {
 				success: boolean;
 				message: string;
+			}
+		}
+
+	}
+
+	export namespace ProductVariants {
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductVariants/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				code: string;
+				name: string;
+				attributes: string;
+				isDefault: boolean;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductVariants/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductVariants/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				productId: Guid;
+				code: string;
+				name: string;
+				attributes: string;
+				isDefault: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+	}
+
+	export namespace Products {
+
+		export namespace Detail {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Products/Detail';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				productGroupId: Guid;
+				productGroupName: string;
+				attributes: string;
+				isSubAssembly: boolean;
+				sortOrder: number;
+				isActive: boolean;
+				variants: IVariantDto[];
+				createdAt: Date;
+				updatedAt?: Date;
+			}
+			export interface IVariantDto {
+				id: Guid;
+				code: string;
+				name: string;
+				attributes: string;
+				isDefault: boolean;
+				isActive: boolean;
+				calculatedCost?: __ERROR_TYPE_NOT_HANDLED__;
+				calculatedCurrency: string;
+				costCalculatedAt?: Date;
+			}
+		}
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Products/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+				name: string;
+				productGroupId: Guid;
+				productGroupName: string;
+				isSubAssembly: boolean;
+				variantCount: number;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Products/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				productGroupId: Guid;
+				attributes: string;
+				isSubAssembly: boolean;
+				sortOrder: number;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Products/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Products/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				code: string;
+				name: string;
+				description: string;
+				productGroupId: Guid;
+				attributes: string;
+				isSubAssembly: boolean;
+				sortOrder: number;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+	}
+
+	export namespace ProductGroups {
+
+		export namespace Detail {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductGroups/Detail';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				icon: string;
+				pricingType: Enums.PricingType;
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				sortOrder: number;
+				isSystemGroup: boolean;
+				isActive: boolean;
+				productCount: number;
+				createdAt: Date;
+				updatedAt?: Date;
+			}
+		}
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductGroups/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+				name: string;
+				icon: string;
+				pricingType: Enums.PricingType;
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				sortOrder: number;
+				isSystemGroup: boolean;
+				isActive: boolean;
+				productCount: number;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductGroups/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				icon: string;
+				pricingType: Enums.PricingType;
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				sortOrder: number;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductGroups/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProductGroups/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				code: string;
+				name: string;
+				description: string;
+				icon: string;
+				pricingType: Enums.PricingType;
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				sortOrder: number;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+	}
+
+	export namespace Materials {
+
+		export namespace Detail {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Materials/Detail';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				category: string;
+				unit: string;
+				unitPrice: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				supplier: string;
+				minOrderQuantity?: __ERROR_TYPE_NOT_HANDLED__;
+				leadTimeDays?: __ERROR_TYPE_NOT_HANDLED__;
+				priceUpdatedAt: Date;
+				isActive: boolean;
+				createdAt: Date;
+				updatedAt?: Date;
+			}
+		}
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Materials/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+				name: string;
+				category: string;
+				unit: string;
+				unitPrice: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				supplier: string;
+				isActive: boolean;
+				priceUpdatedAt: Date;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Materials/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				category: string;
+				unit: string;
+				unitPrice: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				supplier: string;
+				minOrderQuantity?: __ERROR_TYPE_NOT_HANDLED__;
+				leadTimeDays?: __ERROR_TYPE_NOT_HANDLED__;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Materials/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Materials/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				code: string;
+				name: string;
+				description: string;
+				category: string;
+				unit: string;
+				unitPrice: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+				supplier: string;
+				minOrderQuantity?: __ERROR_TYPE_NOT_HANDLED__;
+				leadTimeDays?: __ERROR_TYPE_NOT_HANDLED__;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+	}
+
+	export namespace Lookups {
+
+		export namespace ByCategory {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Lookups/ByCategory';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				category: string;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				category: string;
+				code: string;
+				name: string;
+				description: string;
+				color: string;
+				sortOrder: number;
+				isSystem: boolean;
+				isActive: boolean;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Lookups/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				code: string;
+				name: string;
+				description: string;
+				color: string;
+				sortOrder: number;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Lookups/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Lookups/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				category: string;
+				code: string;
+				name: string;
+				description: string;
+				color: string;
+				sortOrder: number;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				code: string;
 			}
 		}
 
