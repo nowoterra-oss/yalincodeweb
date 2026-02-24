@@ -16,6 +16,7 @@ import {
   UserOutlined,
   BankOutlined,
   SettingOutlined,
+  CalculatorOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUiStore, useAuthStore } from '../../stores';
@@ -111,6 +112,7 @@ const moduleMenus: ModuleMenuConfig[] = [
       { key: '/pricing/lookups', icon: <SettingOutlined />, label: 'Tanimlar' },
       { key: '/pricing/supplier-prices', icon: <TagOutlined />, label: 'Tedarikci Fiyatlari' },
       { key: '/pricing/price-rules', icon: <TagOutlined />, label: 'Fiyat Kurallari' },
+      { key: '/pricing/elevator-configurator', icon: <CalculatorOutlined />, label: 'Asansor Konfiguratoru' },
     ],
   },
 ];

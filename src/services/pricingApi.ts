@@ -527,3 +527,111 @@ export const priceRulesApi = {
   delete: (id: string) =>
     ApiService.call<{ success: boolean }>(api.post(`${BASE}/PriceRules/Delete`, { id })),
 };
+
+// --- Configurator Types ---
+
+export interface ConfiguratorOptions {
+  motorBrands: string[];
+  capacities: number[];
+  speeds: number[];
+  pulleyDiameters: number[];
+  ropeBrands: string[];
+  ropeDiameters: number[];
+  regulatorBrands: string[];
+  panelBrands: string[];
+  doorBrands: string[];
+  doorWidths: number[];
+  doorHeights: number[];
+  doorCoatings: string[];
+  railBrands: string[];
+  railSizes: string[];
+  priceListCategories: Record<string, { itemName: string; salesPrice: number; purchasePriceEUR: number }[]>;
+  brandDiscounts: { brand: string; category: number; discountRateMR: number; discountRateMRL: number; discountRateGeneral: number }[];
+  machinePlatformCapacities: number[];
+  exchangeRates: { currencyCode: string; buyRate: number; sellRate: number; crossRate: number | null }[];
+  defaultProfitMargin: number;
+}
+
+export interface QuotationBreakdownItem {
+  category: string;
+  itemName: string;
+  quantity: number;
+  unit: string;
+  basePrice: number;
+  currency: string;
+  discountRate: number;
+  profitMargin: number;
+  unitPrice: number;
+  totalPrice: number;
+  totalPriceUSD: number;
+}
+
+export interface CalculateQuotationResponse {
+  breakdown: QuotationBreakdownItem[];
+  subtotalUSD: number;
+  totalUSD: number;
+  totalTL: number;
+  totalEUR: number;
+  exchangeRateUSD: number;
+  exchangeRateEUR: number;
+  profitMargin: number;
+}
+
+export interface CalculateQuotationRequest {
+  motorBrand?: string;
+  capacity?: number;
+  speed?: number;
+  motorType?: number;
+  suspensionType?: number;
+  ropeBrand?: string;
+  ropeDiameter?: number;
+  ropeCount?: number;
+  regulatorBrand?: string;
+  panelBrand?: string;
+  installationType?: number;
+  doorBrand?: string;
+  doorWidth?: number;
+  doorHeight?: number;
+  doorOpeningType?: number;
+  doorCoating?: string;
+  doorPanelCount?: number;
+  cabinDoorBrand?: string;
+  railBrand?: string;
+  railSize?: string;
+  counterweightRailBrand?: string;
+  counterweightRailSize?: string;
+  stopCount?: number;
+  floorHeight?: number;
+  lastFloorHeight?: number;
+  pitDepth?: number;
+  shaftLength?: number;
+  entranceCount?: number;
+}
+
+export interface SeedDataResponse {
+  motorPricesInserted: number;
+  controlPanelPricesInserted: number;
+  doorPricesInserted: number;
+  ropePricesInserted: number;
+  railPricesInserted: number;
+  regulatorPricesInserted: number;
+  brandDiscountsInserted: number;
+  machinePlatformPricesInserted: number;
+  profitMarginSettingsInserted: number;
+  tcmbExchangeRatesInserted: number;
+  priceListItemsInserted: number;
+  translationsInserted: number;
+  totalInserted: number;
+  warnings: string[];
+}
+
+// --- Configurator API ---
+
+export const configuratorApi = {
+  getOptions: () =>
+    ApiService.call<ConfiguratorOptions>(api.post(`${BASE}/Configurator/Options`, {})),
+  calculate: (data: CalculateQuotationRequest) =>
+    ApiService.call<CalculateQuotationResponse>(api.post(`${BASE}/Configurator/Calculate`, data)),
+  seedData: (data?: { overwrite?: boolean; seedType?: string }) =>
+    ApiService.call<SeedDataResponse>(api.post(`${BASE}/Configurator/SeedData`, data || {})),
+};

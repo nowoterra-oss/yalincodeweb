@@ -30,9 +30,69 @@ export namespace CeoElevatorAPI {
 			Descending = 1,
 		}
 
+		export enum MotorType {
+			MRL = 0,
+			MR = 1,
+		}
+
+		export enum RailType {
+			GuideRail = 0,
+			RailFlange = 1,
+		}
+
 		export enum PricingType {
 			BOM = 0,
 			SupplierPrice = 1,
+		}
+
+		export enum PriceListCategory {
+			MachineRoom = 0,
+			MachinePlatform = 1,
+			Regulator = 2,
+			Rope = 3,
+			RopeAccessory = 4,
+			Electronics = 5,
+			CopLop = 6,
+			Installation = 7,
+			RailConsole = 8,
+			RailBracket = 9,
+			Cabin = 10,
+			CabinModelManual = 11,
+			CabinModelAutomatic = 12,
+			FloorVisual = 13,
+			FloorModelAutomatic = 14,
+			FloorModelDetail = 15,
+			Granite = 16,
+			CabinFrame = 17,
+			WeightFrame = 18,
+			Brake = 19,
+			WeightSeparator = 20,
+			ConcreteWeight = 21,
+			ConcreteWeightTable = 22,
+			Overload = 23,
+			DoorEI60 = 24,
+			DoorAccessory = 25,
+			Pit = 26,
+			CabinDisplay = 27,
+			CabinButtonBase = 28,
+			CabinButton = 29,
+			FloorButton = 30,
+			Other = 31,
+		}
+
+		export enum SuspensionType {
+			OneToOne = 0,
+			TwoToOne = 1,
+		}
+
+		export enum DoorOpeningType {
+			Telescopic = 0,
+			Central = 1,
+		}
+
+		export enum DoorLocationType {
+			Landing = 0,
+			Cabin = 1,
 		}
 
 		export enum CustomerType {
@@ -40,6 +100,209 @@ export namespace CeoElevatorAPI {
 			Investor = 1,
 			Dealer = 2,
 			Individual = 3,
+		}
+
+		export enum InstallationType {
+			Ready = 0,
+			Parallel = 1,
+		}
+
+		export enum DiscountCategory {
+			Motor = 0,
+			Door = 1,
+			Panel = 2,
+			Rail = 3,
+			Rope = 4,
+			General = 5,
+		}
+
+	}
+
+	export namespace Translations {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Translations/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				category: string;
+				keyTurkish: string;
+				valueEnglish: string;
+				valueRussian: string;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Translations/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				category: string;
+				keyTurkish: string;
+				valueEnglish: string;
+				valueRussian: string;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Translations/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Translations/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				category: string;
+				keyTurkish: string;
+				valueEnglish: string;
+				valueRussian: string;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace TCMBExchangeRates {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/TCMBExchangeRates/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				currencyCode: string;
+				currencyName: string;
+				unit: number;
+				buyRate: __ERROR_TYPE_NOT_HANDLED__;
+				sellRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveBuyRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveSellRate: __ERROR_TYPE_NOT_HANDLED__;
+				companyBuyRate: __ERROR_TYPE_NOT_HANDLED__;
+				companySellRate: __ERROR_TYPE_NOT_HANDLED__;
+				rateDate: Date;
+				isActive: boolean;
+				crossRate?: __ERROR_TYPE_NOT_HANDLED__;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/TCMBExchangeRates/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				currencyCode: string;
+				currencyName: string;
+				unit: number;
+				buyRate: __ERROR_TYPE_NOT_HANDLED__;
+				sellRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveBuyRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveSellRate: __ERROR_TYPE_NOT_HANDLED__;
+				companyBuyRate: __ERROR_TYPE_NOT_HANDLED__;
+				companySellRate: __ERROR_TYPE_NOT_HANDLED__;
+				rateDate: Date;
+				isActive: boolean;
+				crossRate?: __ERROR_TYPE_NOT_HANDLED__;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/TCMBExchangeRates/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/TCMBExchangeRates/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				currencyCode: string;
+				currencyName: string;
+				unit: number;
+				buyRate: __ERROR_TYPE_NOT_HANDLED__;
+				sellRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveBuyRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveSellRate: __ERROR_TYPE_NOT_HANDLED__;
+				companyBuyRate: __ERROR_TYPE_NOT_HANDLED__;
+				companySellRate: __ERROR_TYPE_NOT_HANDLED__;
+				rateDate: Date;
+				crossRate?: __ERROR_TYPE_NOT_HANDLED__;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
 		}
 
 	}
@@ -137,6 +400,370 @@ export namespace CeoElevatorAPI {
 				currency: string;
 				discountRate: __ERROR_TYPE_NOT_HANDLED__;
 				conditions: string;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace RopePrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RopePrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				brand: string;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				pricePerMeter: __ERROR_TYPE_NOT_HANDLED__;
+				pricePerMeterEUR?: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RopePrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				brand: string;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				pricePerMeter: __ERROR_TYPE_NOT_HANDLED__;
+				pricePerMeterEUR?: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RopePrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RopePrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				brand: string;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				pricePerMeter: __ERROR_TYPE_NOT_HANDLED__;
+				pricePerMeterEUR?: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom?: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace RegulatorPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RegulatorPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				brand: string;
+				motorType: Enums.MotorType;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				priceIndex: number;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RegulatorPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				brand: string;
+				motorType: Enums.MotorType;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				priceIndex: number;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RegulatorPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RegulatorPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				brand: string;
+				motorType: Enums.MotorType;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				priceIndex: number;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace RailPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RailPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				railType: Enums.RailType;
+				brand: string;
+				size: string;
+				manualPriceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				calculatedPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RailPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				railType: Enums.RailType;
+				brand: string;
+				size: string;
+				manualPriceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				calculatedPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RailPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/RailPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				railType: Enums.RailType;
+				brand: string;
+				size: string;
+				manualPriceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				calculatedPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace ProfitMarginSettings {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProfitMarginSettings/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				cabinHeightDifferenceRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProfitMarginSettings/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				cabinHeightDifferenceRate: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProfitMarginSettings/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ProfitMarginSettings/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				cabinHeightDifferenceRate: __ERROR_TYPE_NOT_HANDLED__;
 				effectiveFrom: Date;
 				effectiveTo?: Date;
 			}
@@ -592,6 +1219,244 @@ export namespace CeoElevatorAPI {
 
 	}
 
+	export namespace PriceListItems {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceListItems/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+				category: string;
+				categoryEnum?: Enums.PriceListCategory;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				category: string;
+				categoryEnum: Enums.PriceListCategory;
+				itemName: string;
+				itemCode: string;
+				purchasePriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				purchasePriceUSD?: __ERROR_TYPE_NOT_HANDLED__;
+				purchasePriceEUR?: __ERROR_TYPE_NOT_HANDLED__;
+				profitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				salesPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				notes: string;
+				unit: string;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceListItems/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				category: string;
+				categoryEnum: Enums.PriceListCategory;
+				itemName: string;
+				itemCode: string;
+				purchasePriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				purchasePriceUSD?: __ERROR_TYPE_NOT_HANDLED__;
+				purchasePriceEUR?: __ERROR_TYPE_NOT_HANDLED__;
+				profitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				salesPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				notes: string;
+				unit: string;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceListItems/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/PriceListItems/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				category: string;
+				categoryEnum: Enums.PriceListCategory;
+				itemName: string;
+				itemCode: string;
+				purchasePriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				purchasePriceUSD?: __ERROR_TYPE_NOT_HANDLED__;
+				purchasePriceEUR?: __ERROR_TYPE_NOT_HANDLED__;
+				profitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				salesPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				notes: string;
+				unit: string;
+				effectiveFrom?: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace MotorPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MotorPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+				brand: string;
+				motorType?: Enums.MotorType;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				brand: string;
+				capacity: number;
+				motorModel: string;
+				motorType: Enums.MotorType;
+				pulleyDiameter: number;
+				ropeCount: number;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				motorPower: __ERROR_TYPE_NOT_HANDLED__;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				suspensionType: Enums.SuspensionType;
+				current: __ERROR_TYPE_NOT_HANDLED__;
+				basePrice: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				finalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MotorPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				brand: string;
+				capacity: number;
+				motorModel: string;
+				motorType: Enums.MotorType;
+				pulleyDiameter: number;
+				ropeCount: number;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				motorPower: __ERROR_TYPE_NOT_HANDLED__;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				suspensionType: Enums.SuspensionType;
+				current: __ERROR_TYPE_NOT_HANDLED__;
+				basePrice: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				finalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MotorPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MotorPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				brand: string;
+				capacity: number;
+				motorModel: string;
+				motorType: Enums.MotorType;
+				pulleyDiameter: number;
+				ropeCount: number;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				motorPower: __ERROR_TYPE_NOT_HANDLED__;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				suspensionType: Enums.SuspensionType;
+				current: __ERROR_TYPE_NOT_HANDLED__;
+				basePrice: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				finalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom?: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
 	export namespace Materials {
 
 		export namespace Detail {
@@ -719,6 +1584,96 @@ export namespace CeoElevatorAPI {
 
 	}
 
+	export namespace MachinePlatformPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MachinePlatformPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				suspensionType: Enums.SuspensionType;
+				capacity: number;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MachinePlatformPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				suspensionType: Enums.SuspensionType;
+				capacity: number;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MachinePlatformPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/MachinePlatformPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				suspensionType: Enums.SuspensionType;
+				capacity: number;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
 	export namespace Lookups {
 
 		export namespace ByCategory {
@@ -783,6 +1738,118 @@ export namespace CeoElevatorAPI {
 			export interface IResponseModel {
 				id: Guid;
 				code: string;
+			}
+		}
+
+	}
+
+	export namespace DoorPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/DoorPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				brand: string;
+				doorWidth: number;
+				doorHeight: number;
+				openingType: Enums.DoorOpeningType;
+				panelCount: number;
+				coating: string;
+				locationType: Enums.DoorLocationType;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				finalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/DoorPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				brand: string;
+				doorWidth: number;
+				doorHeight: number;
+				openingType: Enums.DoorOpeningType;
+				panelCount: number;
+				coating: string;
+				locationType: Enums.DoorLocationType;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				finalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/DoorPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/DoorPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				brand: string;
+				doorWidth: number;
+				doorHeight: number;
+				openingType: Enums.DoorOpeningType;
+				panelCount: number;
+				coating: string;
+				locationType: Enums.DoorLocationType;
+				priceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				priceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				finalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom?: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
 			}
 		}
 
@@ -886,6 +1953,357 @@ export namespace CeoElevatorAPI {
 			export interface IResponseModel {
 				id: Guid;
 				code: string;
+			}
+		}
+
+	}
+
+	export namespace ControlPanelPrices {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ControlPanelPrices/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				brand: string;
+				installationType: Enums.InstallationType;
+				motorType: Enums.MotorType;
+				suspensionType: Enums.SuspensionType;
+				price5_5kW: __ERROR_TYPE_NOT_HANDLED__;
+				price7_5kW: __ERROR_TYPE_NOT_HANDLED__;
+				price11kW: __ERROR_TYPE_NOT_HANDLED__;
+				price15kW: __ERROR_TYPE_NOT_HANDLED__;
+				price22kW: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ControlPanelPrices/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				brand: string;
+				installationType: Enums.InstallationType;
+				motorType: Enums.MotorType;
+				suspensionType: Enums.SuspensionType;
+				price5_5kW: __ERROR_TYPE_NOT_HANDLED__;
+				price7_5kW: __ERROR_TYPE_NOT_HANDLED__;
+				price11kW: __ERROR_TYPE_NOT_HANDLED__;
+				price15kW: __ERROR_TYPE_NOT_HANDLED__;
+				price22kW: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ControlPanelPrices/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ControlPanelPrices/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				brand: string;
+				installationType: Enums.InstallationType;
+				motorType: Enums.MotorType;
+				suspensionType: Enums.SuspensionType;
+				price5_5kW: __ERROR_TYPE_NOT_HANDLED__;
+				price7_5kW: __ERROR_TYPE_NOT_HANDLED__;
+				price11kW: __ERROR_TYPE_NOT_HANDLED__;
+				price15kW: __ERROR_TYPE_NOT_HANDLED__;
+				price22kW: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom?: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+	}
+
+	export namespace Configurator {
+
+		export namespace Options {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Configurator/Options';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+			}
+			export interface IResponseModel {
+				motorBrands: string[];
+				capacities: number[];
+				speeds: __ERROR_TYPE_NOT_HANDLED__[];
+				pulleyDiameters: number[];
+				ropeBrands: string[];
+				ropeDiameters: __ERROR_TYPE_NOT_HANDLED__[];
+				regulatorBrands: string[];
+				panelBrands: string[];
+				doorBrands: string[];
+				doorWidths: number[];
+				doorHeights: number[];
+				doorCoatings: string[];
+				railBrands: string[];
+				railSizes: string[];
+				priceListCategories: IPriceListCategoryOptions[];
+				brandDiscounts: IBrandDiscountInfo[];
+				machinePlatformCapacities: number[];
+				exchangeRates: IExchangeRateInfo[];
+				defaultProfitMargin: __ERROR_TYPE_NOT_HANDLED__;
+			}
+			export interface IPriceListItemOption {
+				itemName: string;
+				itemCode: string;
+				salesPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				unit: string;
+			}
+			export interface IPriceListCategoryOptions {
+				category: string;
+				categoryEnum: number;
+				items: IPriceListItemOption[];
+			}
+			export interface IBrandDiscountInfo {
+				brand: string;
+				category: number;
+				discountRateMR: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateMRL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateGeneral: __ERROR_TYPE_NOT_HANDLED__;
+			}
+			export interface IExchangeRateInfo {
+				currencyCode: string;
+				buyRate: __ERROR_TYPE_NOT_HANDLED__;
+				sellRate: __ERROR_TYPE_NOT_HANDLED__;
+				companySellRate: __ERROR_TYPE_NOT_HANDLED__;
+				crossRate?: __ERROR_TYPE_NOT_HANDLED__;
+			}
+		}
+
+		export namespace SeedData {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Configurator/SeedData';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				overwrite: boolean;
+				seedType: string;
+			}
+			export interface IResponseModel {
+				motorPricesInserted: number;
+				controlPanelPricesInserted: number;
+				doorPricesInserted: number;
+				ropePricesInserted: number;
+				railPricesInserted: number;
+				regulatorPricesInserted: number;
+				brandDiscountsInserted: number;
+				machinePlatformPricesInserted: number;
+				profitMarginSettingsInserted: number;
+				tCMBExchangeRatesInserted: number;
+				priceListItemsInserted: number;
+				translationsInserted: number;
+				totalInserted: number;
+				warnings: string[];
+			}
+		}
+
+		export namespace Calculate {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Configurator/Calculate';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				floorHeight: __ERROR_TYPE_NOT_HANDLED__;
+				lastFloor: __ERROR_TYPE_NOT_HANDLED__;
+				pitDepth: __ERROR_TYPE_NOT_HANDLED__;
+				consoleDistance: __ERROR_TYPE_NOT_HANDLED__;
+				stopCount: number;
+				floorCount: number;
+				entranceCount: number;
+				motorBrand: string;
+				capacity: number;
+				speed: __ERROR_TYPE_NOT_HANDLED__;
+				motorType: number;
+				suspensionType: number;
+				ropeBrand: string;
+				ropeDiameter: __ERROR_TYPE_NOT_HANDLED__;
+				ropeCount: number;
+				regulatorBrand: string;
+				panelBrand: string;
+				installationType: number;
+				doorWidth: number;
+				doorHeight: number;
+				doorOpeningType: number;
+				doorPanelCount: number;
+				entranceDoorBrand: string;
+				entranceDoorCoating: string;
+				cabinDoorBrand: string;
+				cabinRailBrand: string;
+				cabinRailSize: string;
+				counterweightRailBrand: string;
+				counterweightRailSize: string;
+				currency: number;
+			}
+			export interface IResponseModel {
+				breakdown: IBreakdownItem[];
+				subtotalTL: __ERROR_TYPE_NOT_HANDLED__;
+				subtotalUSD: __ERROR_TYPE_NOT_HANDLED__;
+				subtotalEUR: __ERROR_TYPE_NOT_HANDLED__;
+				profitMargin: __ERROR_TYPE_NOT_HANDLED__;
+				totalTL: __ERROR_TYPE_NOT_HANDLED__;
+				totalUSD: __ERROR_TYPE_NOT_HANDLED__;
+				totalEUR: __ERROR_TYPE_NOT_HANDLED__;
+				exchangeRates: IExchangeRateSnapshot;
+			}
+			export interface IBreakdownItem {
+				sortOrder: number;
+				category: string;
+				itemName: string;
+				itemCode: string;
+				quantity: __ERROR_TYPE_NOT_HANDLED__;
+				unit: string;
+				basePriceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				basePriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRate: __ERROR_TYPE_NOT_HANDLED__;
+				discountAmount: __ERROR_TYPE_NOT_HANDLED__;
+				unitPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				totalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				totalPriceUSD: __ERROR_TYPE_NOT_HANDLED__;
+				totalPriceEUR: __ERROR_TYPE_NOT_HANDLED__;
+				currency: string;
+			}
+			export interface IExchangeRateSnapshot {
+				eUR_TRY: __ERROR_TYPE_NOT_HANDLED__;
+				uSD_TRY: __ERROR_TYPE_NOT_HANDLED__;
+				eUR_USD: __ERROR_TYPE_NOT_HANDLED__;
+			}
+		}
+
+	}
+
+	export namespace BrandDiscounts {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BrandDiscounts/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				sorting: IXSorting;
+				filters: IXFilterItem[];
+				pageRequest: IXPageRequest;
+			}
+			export interface IXSorting {
+				key: string;
+				direction: Enums.XSortingDirection;
+			}
+			export interface IObject {
+			}
+			export interface IXFilterItem {
+				key: string;
+				type: string;
+				isUsed: boolean;
+				values: IObject[];
+				min: IObject;
+				max: IObject;
+				conditionType: string;
+			}
+			export interface IXPageRequest {
+				currentPage: number;
+				perPageCount: number;
+				listAll: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				brand: string;
+				category: Enums.DiscountCategory;
+				discountRateMR: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateMRL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateGeneral: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+				createdAt: Date;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BrandDiscounts/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				brand: string;
+				category: Enums.DiscountCategory;
+				discountRateMR: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateMRL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateGeneral: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BrandDiscounts/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/BrandDiscounts/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				brand: string;
+				category: Enums.DiscountCategory;
+				discountRateMR: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateMRL: __ERROR_TYPE_NOT_HANDLED__;
+				discountRateGeneral: __ERROR_TYPE_NOT_HANDLED__;
+				effectiveFrom: Date;
+				effectiveTo?: Date;
+			}
+			export interface IResponseModel {
+				id: Guid;
 			}
 		}
 
