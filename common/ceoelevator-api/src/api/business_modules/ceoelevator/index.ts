@@ -2066,6 +2066,41 @@ export namespace CeoElevatorAPI {
 
 	export namespace Configurator {
 
+		export namespace Steps {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/Configurator/Steps';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+			}
+			export interface IResponseModel {
+				id: string;
+				stepKey: string;
+				title: string;
+				description: string;
+				icon: string;
+				infoTitle: string;
+				infoDescription: string;
+				sortOrder: number;
+				fields: IStepFieldDto[];
+			}
+			export interface IStepFieldDto {
+				id: string;
+				fieldKey: string;
+				label: string;
+				tooltip: string;
+				fieldType: string;
+				optionsSource: string;
+				staticOptions: string;
+				placeholder: string;
+				isRequired: boolean;
+				minValue?: __ERROR_TYPE_NOT_HANDLED__;
+				maxValue?: __ERROR_TYPE_NOT_HANDLED__;
+				stepValue?: __ERROR_TYPE_NOT_HANDLED__;
+				colSpan: number;
+				groupTitle: string;
+				defaultValue: string;
+			}
+		}
+
 		export namespace Options {
 			export const RequestPath = AppConfig.CeoElevatorUrl + '/Configurator/Options';
 			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
@@ -2139,6 +2174,8 @@ export namespace CeoElevatorAPI {
 				tCMBExchangeRatesInserted: number;
 				priceListItemsInserted: number;
 				translationsInserted: number;
+				configuratorStepsInserted: number;
+				configuratorStepFieldsInserted: number;
 				totalInserted: number;
 				warnings: string[];
 			}
@@ -2149,12 +2186,11 @@ export namespace CeoElevatorAPI {
 			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
 			export interface IRequestModel {
 				floorHeight: __ERROR_TYPE_NOT_HANDLED__;
-				lastFloor: __ERROR_TYPE_NOT_HANDLED__;
+				lastFloorHeight: __ERROR_TYPE_NOT_HANDLED__;
 				pitDepth: __ERROR_TYPE_NOT_HANDLED__;
-				consoleDistance: __ERROR_TYPE_NOT_HANDLED__;
 				stopCount: number;
-				floorCount: number;
 				entranceCount: number;
+				shaftLength: __ERROR_TYPE_NOT_HANDLED__;
 				motorBrand: string;
 				capacity: number;
 				speed: __ERROR_TYPE_NOT_HANDLED__;
@@ -2170,14 +2206,13 @@ export namespace CeoElevatorAPI {
 				doorHeight: number;
 				doorOpeningType: number;
 				doorPanelCount: number;
-				entranceDoorBrand: string;
-				entranceDoorCoating: string;
+				doorBrand: string;
+				doorCoating: string;
 				cabinDoorBrand: string;
-				cabinRailBrand: string;
-				cabinRailSize: string;
+				railBrand: string;
+				railSize: string;
 				counterweightRailBrand: string;
 				counterweightRailSize: string;
-				currency: number;
 			}
 			export interface IResponseModel {
 				breakdown: IBreakdownItem[];
@@ -2188,7 +2223,8 @@ export namespace CeoElevatorAPI {
 				totalTL: __ERROR_TYPE_NOT_HANDLED__;
 				totalUSD: __ERROR_TYPE_NOT_HANDLED__;
 				totalEUR: __ERROR_TYPE_NOT_HANDLED__;
-				exchangeRates: IExchangeRateSnapshot;
+				exchangeRateUSD: __ERROR_TYPE_NOT_HANDLED__;
+				exchangeRateEUR: __ERROR_TYPE_NOT_HANDLED__;
 			}
 			export interface IBreakdownItem {
 				sortOrder: number;
@@ -2201,16 +2237,182 @@ export namespace CeoElevatorAPI {
 				basePriceTL: __ERROR_TYPE_NOT_HANDLED__;
 				discountRate: __ERROR_TYPE_NOT_HANDLED__;
 				discountAmount: __ERROR_TYPE_NOT_HANDLED__;
-				unitPriceTL: __ERROR_TYPE_NOT_HANDLED__;
+				unitPrice: __ERROR_TYPE_NOT_HANDLED__;
 				totalPriceTL: __ERROR_TYPE_NOT_HANDLED__;
 				totalPriceUSD: __ERROR_TYPE_NOT_HANDLED__;
 				totalPriceEUR: __ERROR_TYPE_NOT_HANDLED__;
 				currency: string;
 			}
-			export interface IExchangeRateSnapshot {
-				eUR_TRY: __ERROR_TYPE_NOT_HANDLED__;
-				uSD_TRY: __ERROR_TYPE_NOT_HANDLED__;
-				eUR_USD: __ERROR_TYPE_NOT_HANDLED__;
+		}
+
+	}
+
+	export namespace ConfiguratorSteps {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorSteps/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+			}
+			export interface IResponseModel {
+				id: Guid;
+				stepKey: string;
+				title: string;
+				description: string;
+				icon: string;
+				infoTitle: string;
+				infoDescription: string;
+				sortOrder: number;
+				isActive: boolean;
+				isSystem: boolean;
+				fieldCount: number;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorSteps/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				stepKey: string;
+				title: string;
+				description: string;
+				icon: string;
+				infoTitle: string;
+				infoDescription: string;
+				sortOrder: number;
+				isActive: boolean;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				stepKey: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorSteps/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorSteps/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				stepKey: string;
+				title: string;
+				description: string;
+				icon: string;
+				infoTitle: string;
+				infoDescription: string;
+				sortOrder: number;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				stepKey: string;
+			}
+		}
+
+	}
+
+	export namespace ConfiguratorStepFields {
+
+		export namespace All {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorStepFields/All';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel[]>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				stepId: Guid;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				stepId: Guid;
+				fieldKey: string;
+				label: string;
+				tooltip: string;
+				fieldType: string;
+				optionsSource: string;
+				staticOptions: string;
+				placeholder: string;
+				isRequired: boolean;
+				minValue?: __ERROR_TYPE_NOT_HANDLED__;
+				maxValue?: __ERROR_TYPE_NOT_HANDLED__;
+				stepValue?: __ERROR_TYPE_NOT_HANDLED__;
+				colSpan: number;
+				sortOrder: number;
+				isActive: boolean;
+				groupTitle: string;
+				defaultValue: string;
+			}
+		}
+
+		export namespace Update {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorStepFields/Update';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+				fieldKey: string;
+				label: string;
+				tooltip: string;
+				fieldType: string;
+				optionsSource: string;
+				staticOptions: string;
+				placeholder: string;
+				isRequired: boolean;
+				minValue?: __ERROR_TYPE_NOT_HANDLED__;
+				maxValue?: __ERROR_TYPE_NOT_HANDLED__;
+				stepValue?: __ERROR_TYPE_NOT_HANDLED__;
+				colSpan: number;
+				sortOrder: number;
+				isActive: boolean;
+				groupTitle: string;
+				defaultValue: string;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				fieldKey: string;
+			}
+		}
+
+		export namespace Delete {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorStepFields/Delete';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				id: Guid;
+			}
+			export interface IResponseModel {
+				success: boolean;
+			}
+		}
+
+		export namespace Create {
+			export const RequestPath = AppConfig.CeoElevatorUrl + '/ConfiguratorStepFields/Create';
+			export const Request = (data: IRequestModel) => ApiService.call<IResponseModel>(axios.post(RequestPath,{...data}));
+			export interface IRequestModel {
+				stepId: Guid;
+				fieldKey: string;
+				label: string;
+				tooltip: string;
+				fieldType: string;
+				optionsSource: string;
+				staticOptions: string;
+				placeholder: string;
+				isRequired: boolean;
+				minValue?: __ERROR_TYPE_NOT_HANDLED__;
+				maxValue?: __ERROR_TYPE_NOT_HANDLED__;
+				stepValue?: __ERROR_TYPE_NOT_HANDLED__;
+				colSpan: number;
+				sortOrder: number;
+				groupTitle: string;
+				defaultValue: string;
+			}
+			export interface IResponseModel {
+				id: Guid;
+				fieldKey: string;
 			}
 		}
 

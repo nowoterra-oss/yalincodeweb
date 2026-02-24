@@ -1,40 +1,238 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Steps, Card, Form, InputNumber, Select, Radio, Button, Space, Table, Descriptions,
-  Spin, message, Alert, Row, Col, Divider, Typography, Tag, Result,
+  Spin, message, Alert, Row, Col, Divider, Typography, Tag, Input, Tooltip,
 } from 'antd';
 import {
   ArrowLeftOutlined, ArrowRightOutlined, CalculatorOutlined,
-  CheckCircleOutlined, LoadingOutlined, SettingOutlined,
+  LoadingOutlined, QuestionCircleOutlined,
+  ColumnHeightOutlined, ThunderboltOutlined, NodeIndexOutlined,
+  ControlOutlined, ColumnWidthOutlined, GatewayOutlined,
+  AppstoreOutlined, DollarOutlined, InfoCircleOutlined,
+  BuildOutlined, SafetyCertificateOutlined, SettingOutlined,
+  ToolOutlined, RocketOutlined, TagOutlined, ExperimentOutlined,
 } from '@ant-design/icons';
 import { PageHeader } from '../../components/common/PageHeader';
 import {
   configuratorApi,
   type ConfiguratorOptions,
+  type ConfiguratorStepDto,
+  type ConfiguratorStepFieldDto,
   type CalculateQuotationRequest,
   type CalculateQuotationResponse,
-  type QuotationBreakdownItem,
 } from '../../services/pricingApi';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const STEPS = [
-  { title: 'Boyut', description: 'Kuyu parametreleri' },
-  { title: 'Makine', description: 'Motor secimi' },
-  { title: 'Halat & Regulator', description: 'Halat ve regulator' },
-  { title: 'Pano', description: 'Kumanda panosu' },
-  { title: 'Ray', description: 'Ray secimi' },
-  { title: 'Kapi', description: 'Kapi secimi' },
-  { title: 'Kabin', description: 'Kabin detaylari' },
-  { title: 'Hesaplama', description: 'Fiyat hesabi' },
-];
+// Icon name → React component mapping
+const ICON_MAP: Record<string, React.ReactNode> = {
+  ColumnHeightOutlined: <ColumnHeightOutlined />,
+  ThunderboltOutlined: <ThunderboltOutlined />,
+  NodeIndexOutlined: <NodeIndexOutlined />,
+  ControlOutlined: <ControlOutlined />,
+  ColumnWidthOutlined: <ColumnWidthOutlined />,
+  GatewayOutlined: <GatewayOutlined />,
+  AppstoreOutlined: <AppstoreOutlined />,
+  DollarOutlined: <DollarOutlined />,
+  CalculatorOutlined: <CalculatorOutlined />,
+  BuildOutlined: <BuildOutlined />,
+  SafetyCertificateOutlined: <SafetyCertificateOutlined />,
+  SettingOutlined: <SettingOutlined />,
+  ToolOutlined: <ToolOutlined />,
+  RocketOutlined: <RocketOutlined />,
+  TagOutlined: <TagOutlined />,
+  ExperimentOutlined: <ExperimentOutlined />,
+  InfoCircleOutlined: <InfoCircleOutlined />,
+};
 
+const resolveIcon = (iconName: string | undefined): React.ReactNode =>
+  (iconName && ICON_MAP[iconName]) || <SettingOutlined />;
+
+// Helper: label with optional tooltip
+const FieldLabel: React.FC<{ text: string; tip?: string | null }> = ({ text, tip }) => {
+  if (!tip) return <span>{text}</span>;
+  return (
+    <Space size={4}>
+      <span>{text}</span>
+      <Tooltip title={tip}>
+        <QuestionCircleOutlined style={{ color: '#8c8c8c', fontSize: 13 }} />
+      </Tooltip>
+    </Space>
+  );
+};
+
+// Parse default value from JSON string
+const parseDefaultValue = (val: string | null, fieldType: string): any => {
+  if (val == null || val === '') return undefined;
+  try {
+    const parsed = JSON.parse(val);
+    return parsed;
+  } catch {
+    // If not valid JSON, treat as raw string/number
+    if (fieldType === 'number') {
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    }
+    return val;
+  }
+};
+
+// Parse staticOptions JSON string
+const parseStaticOptions = (json: string | null): Array<{ value: any; label: string; tip?: string }> => {
+  if (!json) return [];
+  try {
+    return JSON.parse(json);
+  } catch {
+    return [];
+  }
+};
+
+// ============================================================
+// Dynamic Step Renderer — renders fields based on DB definitions
+// ============================================================
+const DynamicStepRenderer: React.FC<{
+  step: ConfiguratorStepDto;
+  options: ConfiguratorOptions | null;
+}> = ({ step, options }) => {
+  // Group fields by groupTitle for divider rendering
+  let lastGroup: string | null | undefined = undefined;
+
+  return (
+    <>
+      {step.infoTitle && (
+        <Alert
+          type="info"
+          showIcon
+          icon={resolveIcon(step.icon)}
+          message={step.infoTitle}
+          description={step.infoDescription || undefined}
+          style={{ marginBottom: 20 }}
+        />
+      )}
+      <Row gutter={16}>
+        {step.fields.map((field) => {
+          const showDivider = field.groupTitle != null && field.groupTitle !== lastGroup;
+          if (field.groupTitle != null) lastGroup = field.groupTitle;
+
+          return (
+            <React.Fragment key={field.id}>
+              {showDivider && (
+                <Col span={24}>
+                  <Divider>{field.groupTitle}</Divider>
+                </Col>
+              )}
+              <Col xs={24} sm={field.colSpan === 24 ? 24 : field.colSpan >= 12 ? 12 : field.colSpan >= 8 ? 8 : 6}>
+                <DynamicField field={field} options={options} />
+              </Col>
+            </React.Fragment>
+          );
+        })}
+      </Row>
+    </>
+  );
+};
+
+// ============================================================
+// Dynamic Field — renders a single form field by fieldType
+// ============================================================
+const DynamicField: React.FC<{
+  field: ConfiguratorStepFieldDto;
+  options: ConfiguratorOptions | null;
+}> = ({ field, options }) => {
+  const rules = field.isRequired
+    ? [{ required: true, message: `${field.label} zorunlu` }]
+    : [];
+
+  const label = <FieldLabel text={field.label} tip={field.tooltip} />;
+
+  switch (field.fieldType) {
+    case 'select': {
+      // Dynamic options from configurator options API
+      const optionItems = field.optionsSource && options
+        ? (options as any)[field.optionsSource] as any[] | undefined
+        : null;
+      // Static options from field definition
+      const staticOpts = parseStaticOptions(field.staticOptions);
+
+      return (
+        <Form.Item name={field.fieldKey} label={label} rules={rules}>
+          <Select
+            placeholder={field.placeholder || `${field.label} secin...`}
+            showSearch
+            allowClear
+            optionFilterProp="children"
+            notFoundContent="Bulunamadi"
+          >
+            {optionItems?.map((item) => (
+              <Option key={item} value={item}>{item}</Option>
+            ))}
+            {staticOpts.map((opt) => (
+              <Option key={String(opt.value)} value={opt.value}>
+                {opt.tip ? (
+                  <Tooltip title={opt.tip}>{opt.label}</Tooltip>
+                ) : opt.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      );
+    }
+
+    case 'number':
+      return (
+        <Form.Item name={field.fieldKey} label={label} rules={rules}>
+          <InputNumber
+            min={field.minValue ?? undefined}
+            max={field.maxValue ?? undefined}
+            step={field.stepValue ?? undefined}
+            style={{ width: '100%' }}
+            placeholder={field.placeholder || undefined}
+          />
+        </Form.Item>
+      );
+
+    case 'radio': {
+      const staticOpts = parseStaticOptions(field.staticOptions);
+      return (
+        <Form.Item name={field.fieldKey} label={label} rules={rules}>
+          <Radio.Group buttonStyle="solid" size="large">
+            {staticOpts.map((opt) => (
+              <Tooltip key={String(opt.value)} title={opt.tip || ''}>
+                <Radio.Button value={opt.value}>{opt.label}</Radio.Button>
+              </Tooltip>
+            ))}
+          </Radio.Group>
+        </Form.Item>
+      );
+    }
+
+    case 'text':
+      return (
+        <Form.Item name={field.fieldKey} label={label} rules={rules}>
+          <Input placeholder={field.placeholder || undefined} />
+        </Form.Item>
+      );
+
+    default:
+      return (
+        <Form.Item name={field.fieldKey} label={label} rules={rules}>
+          <Input placeholder={field.placeholder || undefined} />
+        </Form.Item>
+      );
+  }
+};
+
+// ============================================================
+// Main Page Component
+// ============================================================
 export const ElevatorConfiguratorPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [form] = Form.useForm();
   const [options, setOptions] = useState<ConfiguratorOptions | null>(null);
+  const [steps, setSteps] = useState<ConfiguratorStepDto[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
+  const [loadingSteps, setLoadingSteps] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [result, setResult] = useState<CalculateQuotationResponse | null>(null);
   const [seeding, setSeeding] = useState(false);
@@ -51,9 +249,43 @@ export const ElevatorConfiguratorPage: React.FC = () => {
     }
   }, []);
 
+  const loadSteps = useCallback(async () => {
+    try {
+      setLoadingSteps(true);
+      const data = await configuratorApi.getSteps();
+      setSteps(data);
+    } catch (err: any) {
+      message.error('Konfigurator adimlari yuklenemedi: ' + (err?.message || ''));
+    } finally {
+      setLoadingSteps(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadOptions();
-  }, [loadOptions]);
+    loadSteps();
+  }, [loadOptions, loadSteps]);
+
+  // Build initial values from field defaults
+  const initialValues = useMemo(() => {
+    const vals: Record<string, any> = {};
+    for (const step of steps) {
+      for (const field of step.fields) {
+        const dv = parseDefaultValue(field.defaultValue, field.fieldType);
+        if (dv !== undefined) {
+          vals[field.fieldKey] = dv;
+        }
+      }
+    }
+    return vals;
+  }, [steps]);
+
+  // Set form values when steps load
+  useEffect(() => {
+    if (Object.keys(initialValues).length > 0) {
+      form.setFieldsValue(initialValues);
+    }
+  }, [initialValues, form]);
 
   const handleSeedData = async () => {
     try {
@@ -118,18 +350,38 @@ export const ElevatorConfiguratorPage: React.FC = () => {
     }
   };
 
-  const next = () => setCurrent(c => Math.min(c + 1, STEPS.length - 1));
+  const totalSteps = steps.length;
+  const next = () => setCurrent(c => Math.min(c + 1, totalSteps - 1));
   const prev = () => setCurrent(c => Math.max(c - 1, 0));
 
+  const currentStep = steps[current];
+  const isCalculationStep = currentStep?.stepKey === 'calculation';
   const noData = options && options.motorBrands?.length === 0;
+  const isLoading = loadingOptions || loadingSteps;
 
-  if (loadingOptions) {
+  if (isLoading) {
     return (
       <div style={{ padding: 24 }}>
         <PageHeader title="Asansor Konfiguratoru" subtitle="Yukleniyor..." />
         <Card style={{ textAlign: 'center', padding: 60 }}>
           <Spin size="large" />
-          <div style={{ marginTop: 16 }}>Konfigurator secenekleri yukleniyor...</div>
+          <div style={{ marginTop: 16, color: '#8c8c8c' }}>Konfigurator yukleniyor...</div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (steps.length === 0) {
+    return (
+      <div style={{ padding: 24 }}>
+        <PageHeader title="Asansor Konfiguratoru" subtitle="Adim bulunamadi" />
+        <Card style={{ textAlign: 'center', padding: 60 }}>
+          <Alert
+            type="warning"
+            showIcon
+            message="Konfigurator adimlari tanimlanmamis"
+            description="Konfigurator Ayarlari sayfasindan adim tanimlayin veya seed data yukleyin."
+          />
         </Card>
       </div>
     );
@@ -137,7 +389,27 @@ export const ElevatorConfiguratorPage: React.FC = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      <PageHeader title="Asansor Konfiguratoru" subtitle="Asansor bilesenleri secin ve fiyat hesaplayin" />
+      <PageHeader
+        title="Asansor Konfiguratoru"
+        subtitle="Asansor bilesenlerini adim adim secin, otomatik fiyat hesaplayin"
+      />
+
+      {/* Welcome guide */}
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        style={{ marginBottom: 16 }}
+        message="Nasil kullanilir?"
+        description={
+          <span>
+            Sol taraftaki adimlardan sirasiyla ilerleyerek asansor bilesenlerini secin.
+            Her adimda ilgili bilesenleri belirledikten sonra <strong>Ileri</strong> butonuyla bir sonraki adima gecin.
+            Son adimda <strong>Fiyat Hesapla</strong> butonuna tiklayarak toplam maliyet ve fiyat kirilimini goruntuleyebilirsiniz.
+          </span>
+        }
+        closable
+      />
 
       {noData && (
         <Alert
@@ -157,78 +429,71 @@ export const ElevatorConfiguratorPage: React.FC = () => {
       )}
 
       <Row gutter={24}>
+        {/* Left sidebar - Steps */}
         <Col xs={24} lg={6}>
-          <Card size="small" style={{ marginBottom: 16 }}>
+          <Card
+            size="small"
+            style={{ marginBottom: 16, position: 'sticky', top: 16 }}
+            title={<Text strong style={{ fontSize: 13 }}>Konfigurasyon Adimlari</Text>}
+          >
             <Steps
               direction="vertical"
               size="small"
               current={current}
-              items={STEPS.map((s, i) => ({
-                title: s.title,
-                description: s.description,
-                status: i < current ? 'finish' : i === current ? 'process' : 'wait',
-                style: { cursor: 'pointer' },
-                onClick: () => setCurrent(i),
+              items={steps.map((s, i) => ({
+                title: <span style={{ cursor: 'pointer' }} onClick={() => setCurrent(i)}>{s.title}</span>,
+                description: <span style={{ cursor: 'pointer', fontSize: 12 }} onClick={() => setCurrent(i)}>{s.description}</span>,
+                icon: <span style={{ cursor: 'pointer' }} onClick={() => setCurrent(i)}>{resolveIcon(s.icon)}</span>,
+                status: i < current ? 'finish' as const : i === current ? 'process' as const : 'wait' as const,
               }))}
             />
           </Card>
         </Col>
 
+        {/* Right content */}
         <Col xs={24} lg={18}>
           <Card
             title={
               <Space>
-                <SettingOutlined />
-                <span>{STEPS[current].title} - {STEPS[current].description}</span>
+                {resolveIcon(currentStep?.icon)}
+                <span>
+                  Adim {current + 1}/{totalSteps}: {currentStep?.title}
+                </span>
+                <Tag color="processing" style={{ marginLeft: 8, fontWeight: 400 }}>{currentStep?.description}</Tag>
               </Space>
             }
           >
-            <Form
-              form={form}
-              layout="vertical"
-              initialValues={{
-                motorType: 1,
-                suspensionType: 2,
-                installationType: 1,
-                doorOpeningType: 1,
-                doorPanelCount: 2,
-                ropeCount: 4,
-                stopCount: 5,
-                floorHeight: 3000,
-                lastFloorHeight: 3500,
-                pitDepth: 1500,
-                entranceCount: 1,
-              }}
-            >
-              {current === 0 && <StepDimensions />}
-              {current === 1 && <StepMotor options={options} />}
-              {current === 2 && <StepRopeRegulator options={options} />}
-              {current === 3 && <StepPanel options={options} />}
-              {current === 4 && <StepRail options={options} />}
-              {current === 5 && <StepDoor options={options} />}
-              {current === 6 && <StepCabin />}
-              {current === 7 && (
+            <Form form={form} layout="vertical">
+              {isCalculationStep ? (
                 <StepCalculation
                   form={form}
                   result={result}
                   calculating={calculating}
                   onCalculate={handleCalculate}
                 />
+              ) : (
+                currentStep && (
+                  <DynamicStepRenderer step={currentStep} options={options} />
+                )
               )}
             </Form>
 
-            <Divider />
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Divider style={{ margin: '16px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Button
                 icon={<ArrowLeftOutlined />}
                 onClick={prev}
                 disabled={current === 0}
+                size="large"
               >
                 Geri
               </Button>
-              {current < STEPS.length - 1 ? (
-                <Button type="primary" onClick={next} icon={<ArrowRightOutlined />}>
-                  Ileri
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                {current + 1} / {totalSteps}
+              </Text>
+              {current < totalSteps - 1 ? (
+                <Button type="primary" onClick={next} size="large">
+                  Ileri <ArrowRightOutlined />
                 </Button>
               ) : (
                 <Button
@@ -236,6 +501,7 @@ export const ElevatorConfiguratorPage: React.FC = () => {
                   icon={<CalculatorOutlined />}
                   loading={calculating}
                   onClick={handleCalculate}
+                  size="large"
                 >
                   Fiyat Hesapla
                 </Button>
@@ -248,248 +514,9 @@ export const ElevatorConfiguratorPage: React.FC = () => {
   );
 };
 
-// === Step Components ===
-
-const StepDimensions: React.FC = () => (
-  <Row gutter={16}>
-    <Col span={8}>
-      <Form.Item name="stopCount" label="Durak Sayisi" rules={[{ required: true }]}>
-        <InputNumber min={2} max={50} style={{ width: '100%' }} />
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="entranceCount" label="Giris Sayisi" rules={[{ required: true }]}>
-        <InputNumber min={1} max={4} style={{ width: '100%' }} />
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="floorHeight" label="Kat Yuksekligi (mm)" rules={[{ required: true }]}>
-        <InputNumber min={2500} max={6000} step={100} style={{ width: '100%' }} />
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="lastFloorHeight" label="Son Kat Yuksekligi (mm)">
-        <InputNumber min={2500} max={6000} step={100} style={{ width: '100%' }} />
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="pitDepth" label="Kuyu Dibi (mm)" rules={[{ required: true }]}>
-        <InputNumber min={500} max={5000} step={100} style={{ width: '100%' }} />
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="shaftLength" label="Seyir Mesafesi (mm)">
-        <InputNumber min={3000} max={200000} step={100} style={{ width: '100%' }}
-          placeholder="Otomatik hesaplanir" />
-      </Form.Item>
-    </Col>
-  </Row>
-);
-
-const StepMotor: React.FC<{ options: ConfiguratorOptions | null }> = ({ options }) => (
-  <Row gutter={16}>
-    <Col span={12}>
-      <Form.Item name="motorBrand" label="Motor Markasi" rules={[{ required: true }]}>
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.motorBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="capacity" label="Tasima Kapasitesi (kg)" rules={[{ required: true }]}>
-        <Select placeholder="Kapasite secin" showSearch>
-          {options?.capacities?.map(c => <Option key={c} value={c}>{c} kg</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="speed" label="Hiz (m/s)" rules={[{ required: true }]}>
-        <Select placeholder="Hiz secin">
-          {options?.speeds?.map(s => <Option key={s} value={s}>{s} m/s</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="motorType" label="Motor Tipi" rules={[{ required: true }]}>
-        <Radio.Group>
-          <Radio.Button value={1}>MRL</Radio.Button>
-          <Radio.Button value={2}>MR</Radio.Button>
-        </Radio.Group>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="suspensionType" label="Aski Tipi" rules={[{ required: true }]}>
-        <Radio.Group>
-          <Radio.Button value={1}>1:1</Radio.Button>
-          <Radio.Button value={2}>2:1</Radio.Button>
-        </Radio.Group>
-      </Form.Item>
-    </Col>
-  </Row>
-);
-
-const StepRopeRegulator: React.FC<{ options: ConfiguratorOptions | null }> = ({ options }) => (
-  <Row gutter={16}>
-    <Col span={12}>
-      <Form.Item name="ropeBrand" label="Halat Markasi" rules={[{ required: true }]}>
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.ropeBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={6}>
-      <Form.Item name="ropeDiameter" label="Halat Capi (mm)" rules={[{ required: true }]}>
-        <Select placeholder="Cap secin">
-          {options?.ropeDiameters?.map(d => <Option key={d} value={d}>{d} mm</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={6}>
-      <Form.Item name="ropeCount" label="Halat Adedi">
-        <InputNumber min={1} max={12} style={{ width: '100%' }} />
-      </Form.Item>
-    </Col>
-    <Col span={24}>
-      <Divider>Regulator</Divider>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="regulatorBrand" label="Regulator Markasi" rules={[{ required: true }]}>
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.regulatorBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-  </Row>
-);
-
-const StepPanel: React.FC<{ options: ConfiguratorOptions | null }> = ({ options }) => (
-  <Row gutter={16}>
-    <Col span={12}>
-      <Form.Item name="panelBrand" label="Pano Markasi" rules={[{ required: true }]}>
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.panelBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="installationType" label="Tesisat Tipi" rules={[{ required: true }]}>
-        <Radio.Group>
-          <Radio.Button value={1}>Hazir</Radio.Button>
-          <Radio.Button value={2}>Paralel</Radio.Button>
-        </Radio.Group>
-      </Form.Item>
-    </Col>
-  </Row>
-);
-
-const StepRail: React.FC<{ options: ConfiguratorOptions | null }> = ({ options }) => (
-  <Row gutter={16}>
-    <Col span={24}><Title level={5}>Kabin Rayi</Title></Col>
-    <Col span={12}>
-      <Form.Item name="railBrand" label="Kabin Ray Markasi" rules={[{ required: true }]}>
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.railBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="railSize" label="Kabin Ray Olcusu" rules={[{ required: true }]}>
-        <Select placeholder="Olcu secin" showSearch>
-          {options?.railSizes?.map(s => <Option key={s} value={s}>{s}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={24}><Divider /><Title level={5}>Agirlik Rayi</Title></Col>
-    <Col span={12}>
-      <Form.Item name="counterweightRailBrand" label="Agirlik Ray Markasi">
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.railBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={12}>
-      <Form.Item name="counterweightRailSize" label="Agirlik Ray Olcusu">
-        <Select placeholder="Olcu secin" showSearch>
-          {options?.railSizes?.map(s => <Option key={s} value={s}>{s}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-  </Row>
-);
-
-const StepDoor: React.FC<{ options: ConfiguratorOptions | null }> = ({ options }) => (
-  <Row gutter={16}>
-    <Col span={24}><Title level={5}>Kat Kapisi</Title></Col>
-    <Col span={8}>
-      <Form.Item name="doorBrand" label="Kapi Markasi" rules={[{ required: true }]}>
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.doorBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="doorWidth" label="Kapi Genisligi (mm)" rules={[{ required: true }]}>
-        <Select placeholder="Genislik secin">
-          {options?.doorWidths?.map(w => <Option key={w} value={w}>{w} mm</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="doorHeight" label="Kapi Yuksekligi (mm)">
-        <Select placeholder="Yukseklik secin">
-          {options?.doorHeights?.map(h => <Option key={h} value={h}>{h} mm</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="doorOpeningType" label="Kapi Yonu">
-        <Radio.Group>
-          <Radio.Button value={1}>Teleskopik</Radio.Button>
-          <Radio.Button value={2}>Merkezi</Radio.Button>
-        </Radio.Group>
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="doorPanelCount" label="Panel Sayisi">
-        <Select>
-          <Option value={2}>2 Panel</Option>
-          <Option value={3}>3 Panel</Option>
-          <Option value={4}>4 Panel</Option>
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={8}>
-      <Form.Item name="doorCoating" label="Kaplama">
-        <Select placeholder="Kaplama secin" allowClear>
-          {options?.doorCoatings?.map(c => <Option key={c} value={c}>{c}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-    <Col span={24}><Divider /><Title level={5}>Kabin Kapisi</Title></Col>
-    <Col span={8}>
-      <Form.Item name="cabinDoorBrand" label="Kabin Kapi Markasi">
-        <Select placeholder="Marka secin" showSearch allowClear>
-          {options?.doorBrands?.map(b => <Option key={b} value={b}>{b}</Option>)}
-        </Select>
-      </Form.Item>
-    </Col>
-  </Row>
-);
-
-const StepCabin: React.FC = () => (
-  <Row gutter={16}>
-    <Col span={24}>
-      <Alert
-        type="info"
-        showIcon
-        message="Kabin detaylari"
-        description="Kabin modeli, tavan, taban, kupeste ve diger detaylar ilerleyen versiyonlarda eklenecektir. Simdilik temel bilesenler uzerinden fiyat hesaplanmaktadir."
-        style={{ marginBottom: 16 }}
-      />
-    </Col>
-  </Row>
-);
-
+// ============================================================
+// Calculation Step (special — not dynamic)
+// ============================================================
 const StepCalculation: React.FC<{
   form: any;
   result: CalculateQuotationResponse | null;
@@ -502,34 +529,50 @@ const StepCalculation: React.FC<{
     { title: 'Kategori', dataIndex: 'category', key: 'category', width: 140,
       render: (v: string) => <Tag color="blue">{v}</Tag> },
     { title: 'Kalem', dataIndex: 'itemName', key: 'itemName', ellipsis: true },
-    { title: 'Miktar', dataIndex: 'quantity', key: 'quantity', width: 80, align: 'right' as const },
+    { title: 'Miktar', dataIndex: 'quantity', key: 'quantity', width: 80, align: 'right' as const,
+      render: (v: number) => typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(1)) : v },
     { title: 'Birim', dataIndex: 'unit', key: 'unit', width: 60 },
-    { title: 'Birim Fiyat', dataIndex: 'unitPrice', key: 'unitPrice', width: 110, align: 'right' as const,
-      render: (v: number) => v?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
-    { title: 'PB', dataIndex: 'currency', key: 'currency', width: 50 },
-    { title: 'Iskonto %', dataIndex: 'discountRate', key: 'discountRate', width: 90, align: 'right' as const,
-      render: (v: number) => v ? `${(v * 100).toFixed(0)}%` : '-' },
-    { title: 'Toplam (USD)', dataIndex: 'totalPriceUSD', key: 'totalPriceUSD', width: 120, align: 'right' as const,
+    { title: 'Birim Fiyat (TL)', dataIndex: 'unitPrice', key: 'unitPrice', width: 130, align: 'right' as const,
+      render: (v: number) => v?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL' },
+    { title: 'PB', dataIndex: 'currency', key: 'currency', width: 50,
+      render: (v: string) => <Tag color={v === 'EUR' ? 'green' : v === 'USD' ? 'blue' : 'orange'} style={{ fontSize: 11 }}>{v}</Tag> },
+    { title: 'Iskonto', dataIndex: 'discountRate', key: 'discountRate', width: 80, align: 'right' as const,
+      render: (v: number) => v ? <Text type="success">%{(v * 100).toFixed(0)}</Text> : <Text type="secondary">-</Text> },
+    { title: 'Toplam (USD)', dataIndex: 'totalPriceUSD', key: 'totalPriceUSD', width: 130, align: 'right' as const,
       render: (v: number) => <Text strong>${v?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text> },
   ];
 
   return (
     <div>
+      <Alert
+        type="info"
+        showIcon
+        icon={<DollarOutlined />}
+        message="Secimlerinizi kontrol edin ve fiyat hesaplayin"
+        description="Asagidaki ozet tablosunda tum secimleriniz listelenmistir. Degistirmek istediginiz bir bilgi varsa ilgili adima geri donebilirsiniz."
+        style={{ marginBottom: 20 }}
+      />
+
       <Title level={5}>Secim Ozeti</Title>
       <Descriptions bordered size="small" column={{ xs: 1, sm: 2, lg: 3 }} style={{ marginBottom: 24 }}>
-        <Descriptions.Item label="Motor">{values.motorBrand} - {values.capacity}kg - {values.speed}m/s</Descriptions.Item>
-        <Descriptions.Item label="Motor Tipi">{values.motorType === 1 ? 'MRL' : 'MR'}</Descriptions.Item>
-        <Descriptions.Item label="Aski Tipi">{values.suspensionType === 1 ? '1:1' : '2:1'}</Descriptions.Item>
-        <Descriptions.Item label="Halat">{values.ropeBrand} - {values.ropeDiameter}mm x {values.ropeCount}</Descriptions.Item>
-        <Descriptions.Item label="Regulator">{values.regulatorBrand}</Descriptions.Item>
-        <Descriptions.Item label="Pano">{values.panelBrand} ({values.installationType === 1 ? 'Hazir' : 'Paralel'})</Descriptions.Item>
-        <Descriptions.Item label="Kapi">{values.doorBrand} - {values.doorWidth}mm</Descriptions.Item>
-        <Descriptions.Item label="Ray">{values.railBrand} - {values.railSize}</Descriptions.Item>
-        <Descriptions.Item label="Durak">{values.stopCount} durak</Descriptions.Item>
+        <Descriptions.Item label={<><ThunderboltOutlined /> Motor</>}>{values.motorBrand || '-'} - {values.capacity || '-'}kg - {values.speed || '-'}m/s</Descriptions.Item>
+        <Descriptions.Item label="Motor Tipi">{values.motorType === 1 ? 'MRL (Makine Dairesiz)' : 'MR (Makine Daireli)'}</Descriptions.Item>
+        <Descriptions.Item label="Aski Tipi">{values.suspensionType === 1 ? '1:1 (Dogrudan)' : '2:1 (Makarali)'}</Descriptions.Item>
+        <Descriptions.Item label={<><NodeIndexOutlined /> Halat</>}>{values.ropeBrand || '-'} - {values.ropeDiameter || '-'}mm x {values.ropeCount || '-'} adet</Descriptions.Item>
+        <Descriptions.Item label={<><SafetyCertificateOutlined /> Regulator</>}>{values.regulatorBrand || '-'}</Descriptions.Item>
+        <Descriptions.Item label={<><ControlOutlined /> Pano</>}>{values.panelBrand || '-'} ({values.installationType === 1 ? 'Hazir' : 'Paralel'})</Descriptions.Item>
+        <Descriptions.Item label={<><GatewayOutlined /> Kapi</>}>{values.doorBrand || '-'} - {values.doorWidth || '-'}mm x {values.doorHeight || '-'}mm</Descriptions.Item>
+        <Descriptions.Item label={<><ColumnWidthOutlined /> Ray</>}>{values.railBrand || '-'} - {values.railSize || '-'}</Descriptions.Item>
+        <Descriptions.Item label={<><ColumnHeightOutlined /> Durak</>}>{values.stopCount || '-'} durak, {values.entranceCount || 1} giris</Descriptions.Item>
       </Descriptions>
 
       {!result && !calculating && (
-        <div style={{ textAlign: 'center', padding: 40 }}>
+        <div style={{ textAlign: 'center', padding: 40, background: '#fafafa', borderRadius: 8 }}>
+          <CalculatorOutlined style={{ fontSize: 48, color: '#1890ff', marginBottom: 16 }} />
+          <div style={{ marginBottom: 16 }}>
+            <Title level={4} style={{ marginBottom: 4 }}>Fiyat hesaplamaya hazir</Title>
+            <Text type="secondary">Yukaridaki secimlere gore toplam maliyet hesaplanacaktir</Text>
+          </div>
           <Button
             type="primary"
             size="large"
@@ -551,19 +594,54 @@ const StepCalculation: React.FC<{
       {result && (
         <>
           <Divider />
+
+          {/* Total cards at top */}
+          <Row gutter={16} style={{ marginBottom: 24 }}>
+            <Col xs={24} sm={8}>
+              <Card size="small" style={{ textAlign: 'center', borderTop: '3px solid #1890ff' }}>
+                <Text type="secondary">Toplam (USD)</Text>
+                <Title level={3} style={{ margin: '4px 0', color: '#1890ff' }}>
+                  ${result.totalUSD?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </Title>
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small" style={{ textAlign: 'center', borderTop: '3px solid #52c41a' }}>
+                <Text type="secondary">Toplam (EUR)</Text>
+                <Title level={3} style={{ margin: '4px 0', color: '#52c41a' }}>
+                  &euro;{result.totalEUR?.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                </Title>
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small" style={{ textAlign: 'center', borderTop: '3px solid #fa8c16' }}>
+                <Text type="secondary">Toplam (TL)</Text>
+                <Title level={3} style={{ margin: '4px 0', color: '#fa8c16' }}>
+                  {result.totalTL?.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL
+                </Title>
+              </Card>
+            </Col>
+          </Row>
+
+          <Descriptions size="small" bordered style={{ marginBottom: 24 }} column={{ xs: 1, sm: 3 }}>
+            <Descriptions.Item label={<><DollarOutlined /> USD/TL Kuru</>}>{result.exchangeRateUSD?.toFixed(4)}</Descriptions.Item>
+            <Descriptions.Item label={<><DollarOutlined /> EUR/TL Kuru</>}>{result.exchangeRateEUR?.toFixed(4)}</Descriptions.Item>
+            <Descriptions.Item label="Kar Marji">{((result.profitMargin || 0) * 100).toFixed(0)}%</Descriptions.Item>
+          </Descriptions>
+
           <Title level={5}>Fiyat Kirilimi</Title>
           <Table
             dataSource={result.breakdown}
             columns={breakdownColumns}
             rowKey={(_, i) => String(i)}
             size="small"
-            pagination={false}
-            scroll={{ x: 800 }}
+            pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'], showTotal: (total) => `Toplam ${total} kalem` }}
+            scroll={{ x: 900 }}
             summary={() => (
               <Table.Summary fixed>
-                <Table.Summary.Row>
+                <Table.Summary.Row style={{ background: '#e6f7ff' }}>
                   <Table.Summary.Cell index={0} colSpan={7}>
-                    <Text strong>TOPLAM</Text>
+                    <Text strong style={{ fontSize: 14 }}>GENEL TOPLAM</Text>
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={7} align="right">
                     <Text strong style={{ fontSize: 16, color: '#1890ff' }}>
@@ -575,50 +653,12 @@ const StepCalculation: React.FC<{
             )}
           />
 
-          <Row gutter={16} style={{ marginTop: 24 }}>
-            <Col span={8}>
-              <Card size="small" style={{ textAlign: 'center' }}>
-                <Text type="secondary">Toplam (USD)</Text>
-                <Title level={3} style={{ margin: '4px 0', color: '#1890ff' }}>
-                  ${result.totalUSD?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                </Title>
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card size="small" style={{ textAlign: 'center' }}>
-                <Text type="secondary">Toplam (EUR)</Text>
-                <Title level={3} style={{ margin: '4px 0', color: '#52c41a' }}>
-                  {result.totalEUR?.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
-                </Title>
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card size="small" style={{ textAlign: 'center' }}>
-                <Text type="secondary">Toplam (TL)</Text>
-                <Title level={3} style={{ margin: '4px 0', color: '#fa8c16' }}>
-                  {result.totalTL?.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL
-                </Title>
-              </Card>
-            </Col>
-          </Row>
-
-          <Descriptions size="small" bordered style={{ marginTop: 16 }} column={3}>
-            <Descriptions.Item label="USD/TL Kuru">{result.exchangeRateUSD}</Descriptions.Item>
-            <Descriptions.Item label="EUR/TL Kuru">{result.exchangeRateEUR}</Descriptions.Item>
-            <Descriptions.Item label="Kar Marji">{((result.profitMargin || 0) * 100).toFixed(0)}%</Descriptions.Item>
-          </Descriptions>
-
           <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Result
-              status="success"
-              title="Fiyat Hesaplandi"
-              subTitle={`Toplam: $${result.totalUSD?.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
-              extra={[
-                <Button key="recalc" onClick={onCalculate} loading={calculating}>
-                  Yeniden Hesapla
-                </Button>,
-              ]}
-            />
+            <Space size="large">
+              <Button size="large" onClick={onCalculate} loading={calculating} icon={<CalculatorOutlined />}>
+                Yeniden Hesapla
+              </Button>
+            </Space>
           </div>
         </>
       )}

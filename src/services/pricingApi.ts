@@ -553,28 +553,34 @@ export interface ConfiguratorOptions {
 }
 
 export interface QuotationBreakdownItem {
+  sortOrder: number;
   category: string;
   itemName: string;
+  itemCode: string;
   quantity: number;
   unit: string;
-  basePrice: number;
-  currency: string;
+  basePriceEUR: number;
+  basePriceTL: number;
   discountRate: number;
-  profitMargin: number;
+  discountAmount: number;
   unitPrice: number;
-  totalPrice: number;
+  totalPriceTL: number;
   totalPriceUSD: number;
+  totalPriceEUR: number;
+  currency: string;
 }
 
 export interface CalculateQuotationResponse {
   breakdown: QuotationBreakdownItem[];
+  subtotalTL: number;
   subtotalUSD: number;
-  totalUSD: number;
+  subtotalEUR: number;
+  profitMargin: number;
   totalTL: number;
+  totalUSD: number;
   totalEUR: number;
   exchangeRateUSD: number;
   exchangeRateEUR: number;
-  profitMargin: number;
 }
 
 export interface CalculateQuotationRequest {
@@ -630,8 +636,164 @@ export interface SeedDataResponse {
 export const configuratorApi = {
   getOptions: () =>
     ApiService.call<ConfiguratorOptions>(api.post(`${BASE}/Configurator/Options`, {})),
+  getSteps: () =>
+    ApiService.call<ConfiguratorStepDto[]>(api.post(`${BASE}/Configurator/Steps`, {})),
   calculate: (data: CalculateQuotationRequest) =>
     ApiService.call<CalculateQuotationResponse>(api.post(`${BASE}/Configurator/Calculate`, data)),
   seedData: (data?: { overwrite?: boolean; seedType?: string }) =>
     ApiService.call<SeedDataResponse>(api.post(`${BASE}/Configurator/SeedData`, data || {})),
+};
+
+// --- Configurator Steps Types ---
+
+export interface ConfiguratorStepDto {
+  id: string;
+  stepKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  infoTitle: string | null;
+  infoDescription: string | null;
+  sortOrder: number;
+  fields: ConfiguratorStepFieldDto[];
+}
+
+export interface ConfiguratorStepFieldDto {
+  id: string;
+  fieldKey: string;
+  label: string;
+  tooltip: string | null;
+  fieldType: string;
+  optionsSource: string | null;
+  staticOptions: string | null;
+  placeholder: string | null;
+  isRequired: boolean;
+  minValue: number | null;
+  maxValue: number | null;
+  stepValue: number | null;
+  colSpan: number;
+  groupTitle: string | null;
+  defaultValue: string | null;
+}
+
+// --- Configurator Steps Admin Types ---
+
+export interface ConfiguratorStepAdminDto {
+  id: string;
+  stepKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  infoTitle: string | null;
+  infoDescription: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  isSystem: boolean;
+  fieldCount: number;
+}
+
+export interface ConfiguratorStepFieldAdminDto {
+  id: string;
+  stepId: string;
+  fieldKey: string;
+  label: string;
+  tooltip: string | null;
+  fieldType: string;
+  optionsSource: string | null;
+  staticOptions: string | null;
+  placeholder: string | null;
+  isRequired: boolean;
+  minValue: number | null;
+  maxValue: number | null;
+  stepValue: number | null;
+  colSpan: number;
+  sortOrder: number;
+  isActive: boolean;
+  groupTitle: string | null;
+  defaultValue: string | null;
+}
+
+export interface ConfiguratorStepCreateRequest {
+  stepKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  infoTitle?: string;
+  infoDescription?: string;
+  sortOrder: number;
+}
+
+export interface ConfiguratorStepUpdateRequest {
+  id: string;
+  stepKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  infoTitle?: string;
+  infoDescription?: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface ConfiguratorStepFieldCreateRequest {
+  stepId: string;
+  fieldKey: string;
+  label: string;
+  tooltip?: string;
+  fieldType: string;
+  optionsSource?: string;
+  staticOptions?: string;
+  placeholder?: string;
+  isRequired: boolean;
+  minValue?: number;
+  maxValue?: number;
+  stepValue?: number;
+  colSpan: number;
+  sortOrder: number;
+  groupTitle?: string;
+  defaultValue?: string;
+}
+
+export interface ConfiguratorStepFieldUpdateRequest {
+  id: string;
+  fieldKey: string;
+  label: string;
+  tooltip?: string;
+  fieldType: string;
+  optionsSource?: string;
+  staticOptions?: string;
+  placeholder?: string;
+  isRequired: boolean;
+  minValue?: number;
+  maxValue?: number;
+  stepValue?: number;
+  colSpan: number;
+  sortOrder: number;
+  isActive: boolean;
+  groupTitle?: string;
+  defaultValue?: string;
+}
+
+// --- Configurator Steps Admin API ---
+
+export const configuratorStepsApi = {
+  getAll: () =>
+    ApiService.call<ConfiguratorStepAdminDto[]>(api.post(`${BASE}/ConfiguratorSteps/All`, {})),
+  create: (data: ConfiguratorStepCreateRequest) =>
+    ApiService.call<{ id: string; stepKey: string }>(api.post(`${BASE}/ConfiguratorSteps/Create`, data)),
+  update: (data: ConfiguratorStepUpdateRequest) =>
+    ApiService.call<{ id: string; stepKey: string }>(api.post(`${BASE}/ConfiguratorSteps/Update`, data)),
+  delete: (id: string) =>
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/ConfiguratorSteps/Delete`, { id })),
+};
+
+export const configuratorStepFieldsApi = {
+  getAll: (stepId: string) =>
+    ApiService.call<ConfiguratorStepFieldAdminDto[]>(api.post(`${BASE}/ConfiguratorStepFields/All`, { stepId })),
+  create: (data: ConfiguratorStepFieldCreateRequest) =>
+    ApiService.call<{ id: string; fieldKey: string }>(api.post(`${BASE}/ConfiguratorStepFields/Create`, data)),
+  update: (data: ConfiguratorStepFieldUpdateRequest) =>
+    ApiService.call<{ id: string; fieldKey: string }>(api.post(`${BASE}/ConfiguratorStepFields/Update`, data)),
+  delete: (id: string) =>
+    ApiService.call<{ success: boolean }>(api.post(`${BASE}/ConfiguratorStepFields/Delete`, { id })),
 };

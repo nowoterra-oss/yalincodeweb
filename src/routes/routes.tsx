@@ -14,6 +14,7 @@ import { LookupsPage } from '../pages/pricing/LookupsPage';
 import { SupplierPricesPage } from '../pages/pricing/SupplierPricesPage';
 import { PriceRulesPage } from '../pages/pricing/PriceRulesPage';
 import { ElevatorConfiguratorPage } from '../pages/pricing/ElevatorConfiguratorPage';
+import { ConfiguratorSettingsPage } from '../pages/pricing/ConfiguratorSettingsPage';
 
 export const router = createBrowserRouter([
   {
@@ -76,6 +77,7 @@ export const router = createBrowserRouter([
       { path: 'pricing/supplier-prices', element: <SupplierPricesPage /> },
       { path: 'pricing/price-rules', element: <PriceRulesPage /> },
       { path: 'pricing/elevator-configurator', element: <ElevatorConfiguratorPage /> },
+      { path: 'pricing/configurator-settings', element: <ConfiguratorSettingsPage /> },
       // Profile
       { path: 'profile', element: <Profile /> },
       // Settings

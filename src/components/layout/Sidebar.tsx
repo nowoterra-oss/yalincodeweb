@@ -113,6 +113,7 @@ const moduleMenus: ModuleMenuConfig[] = [
       { key: '/pricing/supplier-prices', icon: <TagOutlined />, label: 'Tedarikci Fiyatlari' },
       { key: '/pricing/price-rules', icon: <TagOutlined />, label: 'Fiyat Kurallari' },
       { key: '/pricing/elevator-configurator', icon: <CalculatorOutlined />, label: 'Asansor Konfiguratoru' },
+      { key: '/pricing/configurator-settings', icon: <SettingOutlined />, label: 'Konfigurator Ayarlari' },
     ],
   },
 ];
