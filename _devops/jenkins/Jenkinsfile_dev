@@ -77,7 +77,7 @@ pipeline {
                     mv ${DEPLOY_DIR}/dist ${DEPLOY_DIR}/dist-old 2>/dev/null || true
                     mv ${DEPLOY_DIR}/dist-new ${DEPLOY_DIR}/dist
 
-                    nginx -t && systemctl reload nginx
+                    sudo nginx -t && sudo systemctl reload nginx
                     echo "Deploy tamamlandi!"
                     echo "URL: https://ceoelevator.nwtsoft.com"
                 """
