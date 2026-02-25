@@ -15,6 +15,7 @@ import { SupplierPricesPage } from '../pages/pricing/SupplierPricesPage';
 import { PriceRulesPage } from '../pages/pricing/PriceRulesPage';
 import { ElevatorConfiguratorPage } from '../pages/pricing/ElevatorConfiguratorPage';
 import { ConfiguratorSettingsPage } from '../pages/pricing/ConfiguratorSettingsPage';
+import { PricingGuidePage } from '../pages/pricing/PricingGuidePage';
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,7 @@ export const router = createBrowserRouter([
       { path: 'installations', element: <PlaceholderPage title="Montaj" module="Installation" /> },
       { path: 'field-work', element: <PlaceholderPage title="Saha Isleri" module="Installation" /> },
       // Pricing
+      { path: 'pricing/guide', element: <PricingGuidePage /> },
       { path: 'pricing/product-groups', element: <ProductGroupsPage /> },
       { path: 'pricing/materials', element: <MaterialsPage /> },
       { path: 'pricing/products', element: <ProductsPage /> },
