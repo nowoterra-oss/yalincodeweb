@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Tabs, Form, Input, Button, Avatar, Space, Typography, message, Spin } from 'antd';
+import { Card, Tabs, Form, Input, Button, Avatar, Space, Typography, message, Spin, Alert } from 'antd';
 import { UserOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/auth.store';
 import { PageHeader } from '../../components/common/PageHeader';
@@ -259,6 +259,22 @@ export const Profile: React.FC = () => {
   return (
     <>
       <PageHeader title="Profil" subtitle="Hesap bilgilerinizi yonetin" />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Profil sayfası nasıl çalışır?"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li>"Profil Bilgileri" sekmesinden adınızı, soyadınızı ve telefon numaranızı güncelleyebilirsiniz.</li>
+            <li>"Şifre Değiştir" sekmesinden mevcut şifrenizi kullanarak yeni bir şifre belirleyebilirsiniz.</li>
+            <li>E-posta adresiniz yalnızca yönetici tarafından değiştirilebilir.</li>
+          </ul>
+        }
+      />
+
       <Tabs items={tabItems} />
     </>
   );

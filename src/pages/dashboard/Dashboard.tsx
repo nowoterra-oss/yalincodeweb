@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Typography, Tag, Space, Statistic } from 'antd';
+import { Card, Row, Col, Typography, Tag, Space, Statistic, Alert } from 'antd';
 import {
   AppstoreOutlined,
   SafetyCertificateOutlined,
@@ -37,6 +37,22 @@ export const Dashboard: React.FC = () => {
   return (
     <>
       <PageHeader title="Dashboard" subtitle={`Hos geldiniz, ${user?.firstName || 'Kullanici'}`} />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Dashboard'a hoş geldiniz!"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li>Bu sayfa hesabınızın genel özetini gösterir: kullanıcı bilgileri, lisans durumu ve aktif modüller.</li>
+            <li>Sol menüden aktif modüllerinize hızlıca erişebilirsiniz. Menü sadece firmanıza tanımlı modülleri gösterir.</li>
+            <li>Lisans süreniz dolmak üzereyse sarı, dolmuşsa kırmızı uyarı göreceksiniz.</li>
+            <li>İstatistik kartları ilgili modüller aktif olduğunda otomatik dolacaktır.</li>
+          </ul>
+        }
+      />
 
       <Row gutter={[16, 16]}>
         {/* Hosgeldin karti */}

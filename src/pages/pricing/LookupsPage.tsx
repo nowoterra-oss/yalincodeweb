@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Tabs, message, Switch } from 'antd';
+import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Tabs, message, Switch, Alert } from 'antd';
 import { EditOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
 import { PageHeader } from '../../components/common/PageHeader';
 import { lookupsApi, type LookupValue } from '../../services/pricingApi';
@@ -282,6 +282,23 @@ export const LookupsPage: React.FC = () => {
   return (
     <>
       <PageHeader title="Tanımlar" subtitle="Malzeme kategorileri, birimler ve para birimlerini yönetin" />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Tanımlar nasıl çalışır?"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li>Tanımlar, sistemdeki malzeme kategorileri, birimler ve para birimlerini yönetmenizi sağlar.</li>
+            <li>Her sekme farklı bir tanım türünü listeler. "Yeni Ekle" butonu ile yeni tanım oluşturabilirsiniz.</li>
+            <li>Kilit ikonu olan "Sistem" tanımları silinemez, ancak adları düzenlenebilir.</li>
+            <li>Tanımlar, malzeme ve ürün ekleme sırasında açılır listelerde otomatik olarak görünür.</li>
+          </ul>
+        }
+      />
+
       <Tabs items={tabItems} defaultActiveKey="MaterialCategory" />
     </>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Typography, Tag, Descriptions, Space, Statistic } from 'antd';
+import { Card, Row, Col, Typography, Tag, Descriptions, Space, Statistic, Alert } from 'antd';
 import {
   BankOutlined,
   SafetyCertificateOutlined,
@@ -36,6 +36,21 @@ export const Settings: React.FC = () => {
   return (
     <>
       <PageHeader title="Ayarlar" subtitle="Hesap ve lisans bilgileriniz" />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Ayarlar sayfası hakkında"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li>Bu sayfa firmanıza ait genel bilgileri, oturum bilgilerinizi ve lisans durumunuzu gösterir.</li>
+            <li>Firma bilgileri ve lisans ayarları yalnızca sistem yöneticisi tarafından değiştirilebilir.</li>
+            <li>Aktif modüller, firmanızın lisansına dahil olan özellikleri gösterir.</li>
+          </ul>
+        }
+      />
 
       <Row gutter={[16, 16]}>
         {/* Firma Bilgileri */}

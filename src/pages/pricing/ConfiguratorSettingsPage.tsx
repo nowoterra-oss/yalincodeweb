@@ -20,6 +20,7 @@ import {
   Empty,
   Popconfirm,
   Divider,
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -468,6 +469,22 @@ export const ConfiguratorSettingsPage: React.FC = () => {
         title="Konfigüratör Ayarları"
         subtitle="Konfigüratör adımlarını ve alanlarını yönetin"
         extra={<SettingOutlined style={{ fontSize: 20, color: '#999' }} />}
+      />
+
+      <Alert
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16 }}
+        message="Konfigüratör ayarları nasıl çalışır?"
+        description={
+          <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
+            <li>Sol panelden konfigüratör adımlarını yönetebilirsiniz (örn: Motor Seçimi, Kapı, Ray vb.).</li>
+            <li>Bir adıma tıklayarak sağ panelde o adıma ait alanları görebilir ve düzenleyebilirsiniz.</li>
+            <li>Her alan için tip (text, number, select, radio), genişlik, zorunluluk gibi ayarlar yapılabilir.</li>
+            <li>Adımlar sıralama numarasına göre konfigüratörde görünür. Pasif adımlar kullanıcılara gösterilmez.</li>
+          </ul>
+        }
       />
 
       <Row gutter={24}>
