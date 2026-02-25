@@ -1,0 +1,85 @@
+// PRODUCTION pipeline - su an aktif degil (tek ortam kullaniliyor)
+// Prod ortami acildiginda DEPLOY parametresi aktif edilecek
+pipeline {
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    parameters {
+        booleanParam(name: 'NO_CACHE', defaultValue: false,
+                     description: 'npm cache kullanmadan temiz install yap')
+    }
+
+    environment {
+        DEPLOY_DIR = '/opt/yalincodeweb'
+        NODE_IMAGE = 'node:22-alpine'
+        IMMUTABLE_TAG = "prod-${BUILD_ID}-${GIT_COMMIT.take(8)}"
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "PRODUCTION: Kod cekiliyor..."
+                sh '''
+                    echo "Branch: ${GIT_BRANCH}"
+                    echo "Commit: ${GIT_COMMIT}"
+                '''
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    def cacheFlag = params.NO_CACHE ? '--prefer-offline=false' : ''
+                    sh """
+                        docker run --rm \
+                            -v \${WORKSPACE}:/app \
+                            -w /app \
+                            ${NODE_IMAGE} \
+                            sh -c 'npm ci --ignore-scripts ${cacheFlag}'
+                    """
+                }
+                echo "Dependencies yuklendi."
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh """
+                    docker run --rm \
+                        -v \${WORKSPACE}:/app \
+                        -w /app \
+                        ${NODE_IMAGE} \
+                        sh -c 'npm run build'
+                """
+                echo "Build tamamlandi."
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "PRODUCTION build basariyla tamamlandi! (deploy devre disi)"
+            echo "Build ID: ${BUILD_ID}"
+            echo "Commit: ${GIT_COMMIT}"
+            echo "Tag: ${IMMUTABLE_TAG}"
+        }
+        failure {
+            echo "PRODUCTION Pipeline basarisiz oldu!"
+            echo "Build ID: ${BUILD_ID}"
+            echo "Commit: ${GIT_COMMIT}"
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

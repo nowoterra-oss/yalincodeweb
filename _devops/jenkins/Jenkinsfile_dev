@@ -1,0 +1,128 @@
+pipeline {
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    parameters {
+        booleanParam(name: 'NO_CACHE', defaultValue: false,
+                     description: 'npm cache kullanmadan temiz install yap')
+        booleanParam(name: 'DEPLOY', defaultValue: true,
+                     description: 'Build sonrasi DEV ortamina deploy yap')
+    }
+
+    environment {
+        DEPLOY_DIR = '/opt/yalincodeweb'
+        NODE_IMAGE = 'node:22-alpine'
+        IMMUTABLE_TAG = "dev-${BUILD_ID}-${GIT_COMMIT.take(8)}"
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "DEV: Kod cekiliyor..."
+                sh '''
+                    echo "Branch: ${GIT_BRANCH}"
+                    echo "Commit: ${GIT_COMMIT}"
+                '''
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    def cacheFlag = params.NO_CACHE ? '--prefer-offline=false' : ''
+                    sh """
+                        docker run --rm \
+                            -v \${WORKSPACE}:/app \
+                            -w /app \
+                            ${NODE_IMAGE} \
+                            sh -c 'npm ci --ignore-scripts ${cacheFlag}'
+                    """
+                }
+                echo "Dependencies yuklendi."
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh """
+                    docker run --rm \
+                        -v \${WORKSPACE}:/app \
+                        -w /app \
+                        ${NODE_IMAGE} \
+                        sh -c 'npm run build'
+                """
+                echo "Build tamamlandi."
+            }
+        }
+
+        stage('Deploy to DEV') {
+            when { expression { params.DEPLOY } }
+            steps {
+                sh """
+                    rm -rf ${DEPLOY_DIR}/dist-new
+                    mkdir -p ${DEPLOY_DIR}/dist-new
+                    cp -r \${WORKSPACE}/dist/* ${DEPLOY_DIR}/dist-new/
+
+                    rm -rf ${DEPLOY_DIR}/dist-old
+                    mv ${DEPLOY_DIR}/dist ${DEPLOY_DIR}/dist-old 2>/dev/null || true
+                    mv ${DEPLOY_DIR}/dist-new ${DEPLOY_DIR}/dist
+
+                    nginx -t && systemctl reload nginx
+                    echo "Deploy tamamlandi!"
+                    echo "URL: https://ceoelevator.nwtsoft.com"
+                """
+            }
+        }
+
+        stage('Health Check') {
+            when { expression { params.DEPLOY } }
+            steps {
+                script {
+                    sleep(time: 3, unit: 'SECONDS')
+                    def result = sh(
+                        script: "curl -sf -o /dev/null -w '%{http_code}' https://ceoelevator.nwtsoft.com || true",
+                        returnStdout: true
+                    ).trim()
+                    if (result == '200') {
+                        echo "Tenant Portal: OK (200)"
+                    } else {
+                        echo "UYARI: health check basarisiz (${result})"
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker image prune -f || true'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "DEV Pipeline basariyla tamamlandi!"
+            echo "Build ID: ${BUILD_ID}"
+            echo "Commit: ${GIT_COMMIT}"
+            echo "Tag: ${IMMUTABLE_TAG}"
+        }
+        failure {
+            echo "DEV Pipeline basarisiz oldu!"
+            echo "Build ID: ${BUILD_ID}"
+            echo "Commit: ${GIT_COMMIT}"
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
