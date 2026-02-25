@@ -18,6 +18,7 @@ export interface TenantInfo {
   id: string;
   code: string;
   companyName: string;
+  apiKey: string;
   enabledModules: number;
   moduleNames: string[];
   licenseExpiryDate?: string;
