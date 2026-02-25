@@ -6,17 +6,17 @@ import { lookupsApi, type LookupValue } from '../../services/pricingApi';
 
 const colorOptions = [
   { value: 'blue', label: 'Mavi' },
-  { value: 'cyan', label: 'Camgobegi' },
-  { value: 'green', label: 'Yesil' },
+  { value: 'cyan', label: 'Camgöbeği' },
+  { value: 'green', label: 'Yeşil' },
   { value: 'orange', label: 'Turuncu' },
-  { value: 'red', label: 'Kirmizi' },
+  { value: 'red', label: 'Kırmızı' },
   { value: 'purple', label: 'Mor' },
   { value: 'magenta', label: 'Magenta' },
-  { value: 'gold', label: 'Altin' },
+  { value: 'gold', label: 'Altın' },
   { value: 'volcano', label: 'Volkan' },
   { value: 'geekblue', label: 'Koyu Mavi' },
   { value: 'lime', label: 'Lime' },
-  { value: 'default', label: 'Varsayilan' },
+  { value: 'default', label: 'Varsayılan' },
 ];
 
 interface LookupTabProps {
@@ -38,7 +38,7 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
       const result = await lookupsApi.getByCategory(category);
       setData(result);
     } catch (err: any) {
-      message.error(err?.message || 'Veriler yuklenemedi');
+      message.error(err?.message || 'Veriler yüklenemedi');
     } finally {
       setLoading(false);
     }
@@ -83,7 +83,7 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
           sortOrder: values.sortOrder,
           isActive: values.isActive ?? true,
         });
-        message.success(`${categoryLabel} guncellendi`);
+        message.success(`${categoryLabel} güncellendi`);
       } else {
         await lookupsApi.create({
           category,
@@ -93,13 +93,13 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
           color: values.color || undefined,
           sortOrder: values.sortOrder,
         });
-        message.success(`${categoryLabel} olusturuldu`);
+        message.success(`${categoryLabel} oluşturuldu`);
       }
       setModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setSaving(false);
     }
@@ -107,22 +107,22 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
 
   const handleDelete = (record: LookupValue) => {
     if (record.isSystem) {
-      message.warning('Sistem tanimlari silinemez');
+      message.warning('Sistem tanımları silinemez');
       return;
     }
     Modal.confirm({
       title: `${categoryLabel} Sil`,
-      content: `"${record.name}" tanimini silmek istediginize emin misiniz?`,
+      content: `"${record.name}" tanımını silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await lookupsApi.delete(record.id);
-          message.success('Tanim silindi');
+          message.success('Tanım silindi');
           loadData();
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -150,13 +150,13 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
       ),
     },
     {
-      title: 'Aciklama',
+      title: 'Açıklama',
       dataIndex: 'description',
       key: 'description',
       render: (v: string | null) => v || '-',
     },
     {
-      title: 'Sira',
+      title: 'Sıra',
       dataIndex: 'sortOrder',
       key: 'sortOrder',
       width: 70,
@@ -166,7 +166,7 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
       key: 'isSystem',
       width: 90,
       render: (_: unknown, record: LookupValue) => (
-        <Tag color={record.isSystem ? 'blue' : 'green'}>{record.isSystem ? 'Sistem' : 'Ozel'}</Tag>
+        <Tag color={record.isSystem ? 'blue' : 'green'}>{record.isSystem ? 'Sistem' : 'Özel'}</Tag>
       ),
     },
     {
@@ -177,7 +177,7 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: LookupValue) => (
@@ -212,13 +212,13 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
       />
 
       <Modal
-        title={editing ? `${categoryLabel} Duzenle` : `Yeni ${categoryLabel}`}
+        title={editing ? `${categoryLabel} Düzenle` : `Yeni ${categoryLabel}`}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSave}
         confirmLoading={saving}
-        okText={editing ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editing ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
         width={480}
       >
@@ -228,24 +228,24 @@ const LookupTab: React.FC<LookupTabProps> = ({ category, categoryLabel }) => {
               name="code"
               label="Kod"
               rules={[{ required: true, message: 'Kod zorunludur' }]}
-              tooltip={editing?.isSystem ? 'Sistem tanimlarinin kodu degistirilemez' : 'Benzersiz kisa kod (orn: Sheet, kg, TRY)'}
+              tooltip={editing?.isSystem ? 'Sistem tanımlarının kodu değiştirilemez' : 'Benzersiz kısa kod (örn: Sheet, kg, TRY)'}
             >
-              <Input placeholder="ornek: Sheet" disabled={editing?.isSystem} />
+              <Input placeholder="örnek: Sheet" disabled={editing?.isSystem} />
             </Form.Item>
             <Form.Item name="name" label="Ad" rules={[{ required: true, message: 'Ad zorunludur' }]}>
-              <Input placeholder="ornek: Sac" />
+              <Input placeholder="örnek: Saç" />
             </Form.Item>
           </div>
-          <Form.Item name="description" label="Aciklama">
-            <Input placeholder="Opsiyonel aciklama" />
+          <Form.Item name="description" label="Açıklama">
+            <Input placeholder="Opsiyonel açıklama" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
             {category === 'MaterialCategory' && (
               <Form.Item name="color" label="Renk">
-                <Select options={colorOptions} allowClear placeholder="Renk secin" />
+                <Select options={colorOptions} allowClear placeholder="Renk seçin" />
               </Form.Item>
             )}
-            <Form.Item name="sortOrder" label="Siralama">
+            <Form.Item name="sortOrder" label="Sıralama">
               <InputNumber min={0} style={{ width: '100%' }} />
             </Form.Item>
           </div>
@@ -281,7 +281,7 @@ export const LookupsPage: React.FC = () => {
 
   return (
     <>
-      <PageHeader title="Tanimlar" subtitle="Malzeme kategorileri, birimler ve para birimlerini yonetin" />
+      <PageHeader title="Tanımlar" subtitle="Malzeme kategorileri, birimler ve para birimlerini yönetin" />
       <Tabs items={tabItems} defaultActiveKey="MaterialCategory" />
     </>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Alert, message, Switch } from 'antd';
+import { Table, Tag, Modal, Form, Input, InputNumber, Select, Space, Button, Alert, message, Switch, DatePicker } from 'antd';
+import dayjs from 'dayjs';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { PageHeader } from '../../components/common/PageHeader';
 import { formatDate, formatCurrency } from '../../utils/formatters';
@@ -31,7 +32,7 @@ export const SupplierPricesPage: React.FC = () => {
       const result = await supplierPricesApi.getAll(filterProductId ? { productId: filterProductId } : {});
       setData(result);
     } catch (err: any) {
-      message.error(err?.message || 'Veriler yuklenemedi');
+      message.error(err?.message || 'Veriler yüklenemedi');
     } finally {
       setLoading(false);
     }
@@ -42,7 +43,7 @@ export const SupplierPricesPage: React.FC = () => {
       const result = await productsApi.getAll();
       setProducts(result);
     } catch (err: any) {
-      console.warn('Urun verileri yuklenemedi:', err?.message);
+      console.warn('Ürün verileri yüklenemedi:', err?.message);
     }
   };
 
@@ -51,7 +52,7 @@ export const SupplierPricesPage: React.FC = () => {
       const result = await lookupsApi.getByCategory('Currency');
       setCurrencies(result);
     } catch (err: any) {
-      console.warn('Para birimi verileri yuklenemedi:', err?.message);
+      console.warn('Para birimi verileri yüklenemedi:', err?.message);
     }
   };
 
@@ -68,7 +69,7 @@ export const SupplierPricesPage: React.FC = () => {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ currency: 'TRY', price: 0, discountRate: 0, effectiveFrom: '' });
+    form.setFieldsValue({ currency: 'EUR', price: 0, discountRate: 0, effectiveFrom: null });
     setModalOpen(true);
   };
 
@@ -81,8 +82,8 @@ export const SupplierPricesPage: React.FC = () => {
       price: record.price,
       currency: record.currency,
       discountRate: record.discountRate * 100,
-      effectiveFrom: record.effectiveFrom?.substring(0, 10) || '',
-      effectiveTo: record.effectiveTo?.substring(0, 10) || '',
+      effectiveFrom: record.effectiveFrom ? dayjs(record.effectiveFrom) : null,
+      effectiveTo: record.effectiveTo ? dayjs(record.effectiveTo) : null,
       conditions: record.conditions || '',
       isActive: record.isActive,
     });
@@ -104,11 +105,11 @@ export const SupplierPricesPage: React.FC = () => {
           currency: values.currency,
           discountRate: values.discountRate / 100,
           conditions: values.conditions || undefined,
-          effectiveFrom: values.effectiveFrom,
-          effectiveTo: values.effectiveTo || undefined,
+          effectiveFrom: values.effectiveFrom?.format('YYYY-MM-DD'),
+          effectiveTo: values.effectiveTo?.format('YYYY-MM-DD') || undefined,
           isActive: values.isActive ?? true,
         });
-        message.success('Tedarikci fiyati guncellendi');
+        message.success('Tedarikçi fiyatı güncellendi');
       } else {
         await supplierPricesApi.create({
           productId: values.productId,
@@ -118,16 +119,16 @@ export const SupplierPricesPage: React.FC = () => {
           currency: values.currency,
           discountRate: values.discountRate / 100,
           conditions: values.conditions || undefined,
-          effectiveFrom: values.effectiveFrom,
-          effectiveTo: values.effectiveTo || undefined,
+          effectiveFrom: values.effectiveFrom?.format('YYYY-MM-DD'),
+          effectiveTo: values.effectiveTo?.format('YYYY-MM-DD') || undefined,
         });
-        message.success('Tedarikci fiyati olusturuldu');
+        message.success('Tedarikçi fiyatı oluşturuldu');
       }
       setModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setSaving(false);
     }
@@ -135,18 +136,18 @@ export const SupplierPricesPage: React.FC = () => {
 
   const handleDelete = (record: SupplierPriceListItem) => {
     Modal.confirm({
-      title: 'Tedarikci Fiyatini Sil',
-      content: `"${record.productName}" urunune ait tedarikci fiyatini silmek istediginize emin misiniz?`,
+      title: 'Tedarikçi Fiyatını Sil',
+      content: `"${record.productName}" ürününe ait tedarikçi fiyatını silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await supplierPricesApi.delete(record.id);
-          message.success('Tedarikci fiyati silindi');
+          message.success('Tedarikçi fiyatı silindi');
           loadData();
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -154,43 +155,46 @@ export const SupplierPricesPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Urun',
+      title: 'Ürün',
       dataIndex: 'productName',
       key: 'productName',
       width: 180,
+      sorter: (a: SupplierPriceListItem, b: SupplierPriceListItem) => (a.productName || '').localeCompare(b.productName || ''),
       render: (val: string) => <Tag>{val}</Tag>,
     },
     {
-      title: 'Urun Kodu',
+      title: 'Ürün Kodu',
       dataIndex: 'productCode',
       key: 'productCode',
       width: 120,
       render: (text: string) => <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{text}</span>,
     },
     { title: 'Marka', dataIndex: 'brand', key: 'brand', width: 120, render: (v: string | null) => v || '-' },
-    { title: 'Tedarikci', dataIndex: 'supplierName', key: 'supplierName', width: 140, render: (v: string | null) => v || '-' },
+    { title: 'Tedarikçi', dataIndex: 'supplierName', key: 'supplierName', width: 140, render: (v: string | null) => v || '-' },
     {
       title: 'Fiyat',
       key: 'price',
       width: 130,
+      sorter: (a: SupplierPriceListItem, b: SupplierPriceListItem) => a.price - b.price,
       render: (_: unknown, record: SupplierPriceListItem) => formatCurrency(record.price, record.currency),
     },
     {
-      title: 'Iskonto',
+      title: 'İskonto',
       dataIndex: 'discountRate',
       key: 'discountRate',
       width: 90,
       render: (val: number) => `%${(val * 100).toFixed(0)}`,
     },
     {
-      title: 'Gecerlilik',
+      title: 'Geçerlilik',
       dataIndex: 'effectiveFrom',
       key: 'effectiveFrom',
       width: 110,
+      sorter: (a: SupplierPriceListItem, b: SupplierPriceListItem) => new Date(a.effectiveFrom).getTime() - new Date(b.effectiveFrom).getTime(),
       render: (val: string) => formatDate(val),
     },
     {
-      title: 'Bitis',
+      title: 'Bitiş',
       dataIndex: 'effectiveTo',
       key: 'effectiveTo',
       width: 110,
@@ -204,7 +208,7 @@ export const SupplierPricesPage: React.FC = () => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: SupplierPriceListItem) => (
@@ -218,20 +222,20 @@ export const SupplierPricesPage: React.FC = () => {
 
   return (
     <>
-      <PageHeader title="Tedarikci Fiyatlari" subtitle="Urunlere ait tedarikci fiyatlarini yonetin" showAdd addText="Yeni Fiyat" onAdd={openCreate} />
+      <PageHeader title="Tedarikçi Fiyatları" subtitle="Ürünlere ait tedarikçi fiyatlarını yönetin" showAdd addText="Yeni Fiyat" onAdd={openCreate} />
 
       <Alert
         type="info"
         showIcon
         closable
         style={{ marginBottom: 16 }}
-        message="Tedarikci Fiyatlari nasil calisir?"
+        message="Tedarikçi Fiyatları nasıl çalışır?"
         description={
           <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
-            <li><b>Tedarikci Fiyatlari</b>, Type B (Tedarikci Fiyati) urun gruplarina ait urunlerin alis fiyatlarini tutar.</li>
-            <li>Her fiyat kaydinin <b>gecerlilik tarihi</b> vardir; tekliflerde aktif ve gecerli fiyat kullanilir.</li>
-            <li><b>Iskonto orani</b>, tedarikcinin sagladigi indirim yuzdesini belirtir.</li>
-            <li><b>Kosullar</b> alanina ozel anlasma detaylari (JSON) yazilabilir.</li>
+            <li><b>Tedarikçi Fiyatları</b>, Type B (Tedarikçi Fiyatı) ürün gruplarına ait ürünlerin alış fiyatlarını tutar.</li>
+            <li>Her fiyat kaydının <b>geçerlilik tarihi</b> vardır; tekliflerde aktif ve geçerli fiyat kullanılır.</li>
+            <li><b>İskonto oranı</b>, tedarikçinin sağladığı indirim yüzdesini belirtir.</li>
+            <li><b>Koşullar</b> alanına özel anlaşma detayları (JSON) yazılabilir.</li>
           </ul>
         }
       />
@@ -239,7 +243,7 @@ export const SupplierPricesPage: React.FC = () => {
       <div style={{ marginBottom: 16 }}>
         <Select
           allowClear
-          placeholder="Tum Urunler"
+          placeholder="Tüm Ürünler"
           style={{ width: 280 }}
           value={filterProductId}
           onChange={(val) => setFilterProductId(val)}
@@ -255,42 +259,42 @@ export const SupplierPricesPage: React.FC = () => {
         dataSource={data}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayit` }}
+        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayıt` }}
         size="middle"
       />
 
       <Modal
-        title={editing ? 'Tedarikci Fiyatini Duzenle' : 'Yeni Tedarikci Fiyati'}
+        title={editing ? 'Tedarikçi Fiyatını Düzenle' : 'Yeni Tedarikçi Fiyatı'}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSave}
         confirmLoading={saving}
-        okText={editing ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editing ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
         width={640}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="productId" label="Urun" tooltip="Fiyatin ait oldugu urun" rules={[{ required: true, message: 'Urun zorunludur' }]}>
-              <Select placeholder="Urun secin">
+            <Form.Item name="productId" label="Ürün" tooltip="Fiyatın ait olduğu ürün" rules={[{ required: true, message: 'Ürün zorunludur' }]}>
+              <Select placeholder="Ürün seçin">
                 {products.map(p => (
                   <Select.Option key={p.id} value={p.id}>{p.name} ({p.code})</Select.Option>
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item name="brand" label="Marka" tooltip="Urunun markasi (istege bagli)">
-              <Input placeholder="Marka adi" />
+            <Form.Item name="brand" label="Marka" tooltip="Ürünün markası (isteğe bağlı)">
+              <Input placeholder="Marka adı" />
             </Form.Item>
           </div>
-          <Form.Item name="supplierName" label="Tedarikci" tooltip="Tedarikcinin adi veya firma unvani">
-            <Input placeholder="Tedarikci adi" />
+          <Form.Item name="supplierName" label="Tedarikçi" tooltip="Tedarikçinin adı veya firma ünvanı">
+            <Input placeholder="Tedarikçi adı" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="price" label="Fiyat" tooltip="Urunun alis fiyati" rules={[{ required: true, message: 'Fiyat zorunludur' }]}>
+            <Form.Item name="price" label="Fiyat" tooltip="Ürünün alış fiyatı" rules={[{ required: true, message: 'Fiyat zorunludur' }]}>
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="currency" label="Para Birimi" tooltip="Fiyatin gecerli oldugu para birimi" rules={[{ required: true, message: 'Para birimi zorunludur' }]}>
+            <Form.Item name="currency" label="Para Birimi" tooltip="Fiyatın geçerli olduğu para birimi" rules={[{ required: true, message: 'Para birimi zorunludur' }]}>
               <Select>
                 {currencies.filter(c => c.isActive).map(c => (
                   <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
@@ -298,19 +302,19 @@ export const SupplierPricesPage: React.FC = () => {
               </Select>
             </Form.Item>
           </div>
-          <Form.Item name="discountRate" label="Iskonto Orani (%)" tooltip="Tedarikcinin sagladigi indirim yuzdesi (0-100)" rules={[{ required: true, message: 'Iskonto orani zorunludur' }]}>
+          <Form.Item name="discountRate" label="İskonto Oranı (%)" tooltip="Tedarikçinin sağladığı indirim yüzdesi (0-100)" rules={[{ required: true, message: 'İskonto oranı zorunludur' }]}>
             <InputNumber min={0} max={100} suffix="%" style={{ width: '100%' }} />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="effectiveFrom" label="Gecerlilik Baslangici" tooltip="Fiyatin gecerli olmaya basladigi tarih" rules={[{ required: true, message: 'Gecerlilik tarihi zorunludur' }]}>
-              <Input placeholder="YYYY-MM-DD" />
+            <Form.Item name="effectiveFrom" label="Geçerlilik Başlangıcı" tooltip="Fiyatın geçerli olmaya başladığı tarih" rules={[{ required: true, message: 'Geçerlilik tarihi zorunludur' }]}>
+              <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} placeholder="Tarih seçin" />
             </Form.Item>
-            <Form.Item name="effectiveTo" label="Gecerlilik Bitisi" tooltip="Fiyatin gecerliliginin sona erdigi tarih (istege bagli)">
-              <Input placeholder="YYYY-MM-DD" />
+            <Form.Item name="effectiveTo" label="Geçerlilik Bitişi" tooltip="Fiyatın geçerliliğinin sona erdiği tarih (isteğe bağlı)">
+              <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} placeholder="Tarih seçin" />
             </Form.Item>
           </div>
-          <Form.Item name="conditions" label="Kosullar" tooltip="Ozel anlasma detaylari (JSON formatinda, istege bagli)">
-            <Input.TextArea rows={2} placeholder="Ozel kosullar veya anlasma detaylari" />
+          <Form.Item name="conditions" label="Koşullar" tooltip="Özel anlaşma detayları (JSON formatında, isteğe bağlı)">
+            <Input.TextArea rows={2} placeholder="Özel koşullar veya anlaşma detayları" />
           </Form.Item>
           {editing && (
             <Form.Item name="isActive" label="Aktif" valuePropName="checked">

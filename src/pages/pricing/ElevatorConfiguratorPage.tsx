@@ -158,11 +158,11 @@ const DynamicField: React.FC<{
       return (
         <Form.Item name={field.fieldKey} label={label} rules={rules}>
           <Select
-            placeholder={field.placeholder || `${field.label} secin...`}
+            placeholder={field.placeholder || `${field.label} seçin...`}
             showSearch
             allowClear
             optionFilterProp="children"
-            notFoundContent="Bulunamadi"
+            notFoundContent="Bulunamadı"
           >
             {optionItems?.map((item) => (
               <Option key={item} value={item}>{item}</Option>
@@ -243,7 +243,7 @@ export const ElevatorConfiguratorPage: React.FC = () => {
       const data = await configuratorApi.getOptions();
       setOptions(data);
     } catch (err: any) {
-      message.error('Konfigurator secenekleri yuklenemedi: ' + (err?.message || ''));
+      message.error('Konfigüratör seçenekleri yüklenemedi: ' + (err?.message || ''));
     } finally {
       setLoadingOptions(false);
     }
@@ -255,7 +255,7 @@ export const ElevatorConfiguratorPage: React.FC = () => {
       const data = await configuratorApi.getSteps();
       setSteps(data);
     } catch (err: any) {
-      message.error('Konfigurator adimlari yuklenemedi: ' + (err?.message || ''));
+      message.error('Konfigüratör adımları yüklenemedi: ' + (err?.message || ''));
     } finally {
       setLoadingSteps(false);
     }
@@ -291,13 +291,13 @@ export const ElevatorConfiguratorPage: React.FC = () => {
     try {
       setSeeding(true);
       const res = await configuratorApi.seedData({ overwrite: true });
-      message.success(`${res.totalInserted} kayit basariyla yuklendi!`);
+      message.success(`${res.totalInserted} kayıt başarıyla yüklendi!`);
       if (res.warnings?.length > 0) {
-        message.warning(`Uyarilar: ${res.warnings.join(', ')}`);
+        message.warning(`Uyarılar: ${res.warnings.join(', ')}`);
       }
       await loadOptions();
     } catch (err: any) {
-      message.error('Veri yukleme hatasi: ' + (err?.message || ''));
+      message.error('Veri yükleme hatası: ' + (err?.message || ''));
     } finally {
       setSeeding(false);
     }
@@ -342,9 +342,9 @@ export const ElevatorConfiguratorPage: React.FC = () => {
 
       const data = await configuratorApi.calculate(request);
       setResult(data);
-      message.success('Fiyat hesaplandi!');
+      message.success('Fiyat hesaplandı!');
     } catch (err: any) {
-      message.error('Hesaplama hatasi: ' + (err?.message || ''));
+      message.error('Hesaplama hatası: ' + (err?.message || ''));
     } finally {
       setCalculating(false);
     }
@@ -362,10 +362,10 @@ export const ElevatorConfiguratorPage: React.FC = () => {
   if (isLoading) {
     return (
       <div style={{ padding: 24 }}>
-        <PageHeader title="Asansor Konfiguratoru" subtitle="Yukleniyor..." />
+        <PageHeader title="Asansör Konfigüratörü" subtitle="Yükleniyor..." />
         <Card style={{ textAlign: 'center', padding: 60 }}>
           <Spin size="large" />
-          <div style={{ marginTop: 16, color: '#8c8c8c' }}>Konfigurator yukleniyor...</div>
+          <div style={{ marginTop: 16, color: '#8c8c8c' }}>Konfigüratör yükleniyor...</div>
         </Card>
       </div>
     );
@@ -374,13 +374,13 @@ export const ElevatorConfiguratorPage: React.FC = () => {
   if (steps.length === 0) {
     return (
       <div style={{ padding: 24 }}>
-        <PageHeader title="Asansor Konfiguratoru" subtitle="Adim bulunamadi" />
+        <PageHeader title="Asansör Konfigüratörü" subtitle="Adım bulunamadı" />
         <Card style={{ textAlign: 'center', padding: 60 }}>
           <Alert
             type="warning"
             showIcon
-            message="Konfigurator adimlari tanimlanmamis"
-            description="Konfigurator Ayarlari sayfasindan adim tanimlayin veya seed data yukleyin."
+            message="Konfigüratör adımları tanımlanmamış"
+            description="Konfigüratör Ayarları sayfasından adım tanımlayın veya seed data yükleyin."
           />
         </Card>
       </div>
@@ -390,8 +390,8 @@ export const ElevatorConfiguratorPage: React.FC = () => {
   return (
     <div style={{ padding: 24 }}>
       <PageHeader
-        title="Asansor Konfiguratoru"
-        subtitle="Asansor bilesenlerini adim adim secin, otomatik fiyat hesaplayin"
+        title="Asansör Konfigüratörü"
+        subtitle="Asansör bileşenlerini adım adım seçin, otomatik fiyat hesaplayın"
       />
 
       {/* Welcome guide */}
@@ -400,12 +400,12 @@ export const ElevatorConfiguratorPage: React.FC = () => {
         showIcon
         icon={<InfoCircleOutlined />}
         style={{ marginBottom: 16 }}
-        message="Nasil kullanilir?"
+        message="Nasıl kullanılır?"
         description={
           <span>
-            Sol taraftaki adimlardan sirasiyla ilerleyerek asansor bilesenlerini secin.
-            Her adimda ilgili bilesenleri belirledikten sonra <strong>Ileri</strong> butonuyla bir sonraki adima gecin.
-            Son adimda <strong>Fiyat Hesapla</strong> butonuna tiklayarak toplam maliyet ve fiyat kirilimini goruntuleyebilirsiniz.
+            Sol taraftaki adımlardan sırasıyla ilerleyerek asansör bileşenlerini seçin.
+            Her adımda ilgili bileşenleri belirledikten sonra <strong>İleri</strong> butonuyla bir sonraki adıma geçin.
+            Son adımda <strong>Fiyat Hesapla</strong> butonuna tıklayarak toplam maliyet ve fiyat kırılımını görüntüleyebilirsiniz.
           </span>
         }
         closable
@@ -416,12 +416,12 @@ export const ElevatorConfiguratorPage: React.FC = () => {
           type="warning"
           showIcon
           style={{ marginBottom: 16 }}
-          message="Fiyat verileri henuz yuklenmemis"
+          message="Fiyat verileri henüz yüklenmemiş"
           description={
             <Space direction="vertical">
-              <Text>Konfigurator icin fiyat verilerinin yuklenmesi gerekiyor.</Text>
+              <Text>Konfigüratör için fiyat verilerinin yüklenmesi gerekiyor.</Text>
               <Button type="primary" loading={seeding} onClick={handleSeedData}>
-                Fiyat Verilerini Yukle
+                Fiyat Verilerini Yükle
               </Button>
             </Space>
           }
@@ -434,7 +434,7 @@ export const ElevatorConfiguratorPage: React.FC = () => {
           <Card
             size="small"
             style={{ marginBottom: 16, position: 'sticky', top: 16 }}
-            title={<Text strong style={{ fontSize: 13 }}>Konfigurasyon Adimlari</Text>}
+            title={<Text strong style={{ fontSize: 13 }}>Konfigürasyon Adımları</Text>}
           >
             <Steps
               direction="vertical"
@@ -457,7 +457,7 @@ export const ElevatorConfiguratorPage: React.FC = () => {
               <Space>
                 {resolveIcon(currentStep?.icon)}
                 <span>
-                  Adim {current + 1}/{totalSteps}: {currentStep?.title}
+                  Adım {current + 1}/{totalSteps}: {currentStep?.title}
                 </span>
                 <Tag color="processing" style={{ marginLeft: 8, fontWeight: 400 }}>{currentStep?.description}</Tag>
               </Space>
@@ -493,7 +493,7 @@ export const ElevatorConfiguratorPage: React.FC = () => {
               </Text>
               {current < totalSteps - 1 ? (
                 <Button type="primary" onClick={next} size="large">
-                  Ileri <ArrowRightOutlined />
+                  İleri <ArrowRightOutlined />
                 </Button>
               ) : (
                 <Button
@@ -548,19 +548,19 @@ const StepCalculation: React.FC<{
         type="info"
         showIcon
         icon={<DollarOutlined />}
-        message="Secimlerinizi kontrol edin ve fiyat hesaplayin"
-        description="Asagidaki ozet tablosunda tum secimleriniz listelenmistir. Degistirmek istediginiz bir bilgi varsa ilgili adima geri donebilirsiniz."
+        message="Seçimlerinizi kontrol edin ve fiyat hesaplayın"
+        description="Aşağıdaki özet tablosunda tüm seçimleriniz listelenmiştir. Değiştirmek istediğiniz bir bilgi varsa ilgili adıma geri dönebilirsiniz."
         style={{ marginBottom: 20 }}
       />
 
-      <Title level={5}>Secim Ozeti</Title>
+      <Title level={5}>Seçim Özeti</Title>
       <Descriptions bordered size="small" column={{ xs: 1, sm: 2, lg: 3 }} style={{ marginBottom: 24 }}>
         <Descriptions.Item label={<><ThunderboltOutlined /> Motor</>}>{values.motorBrand || '-'} - {values.capacity || '-'}kg - {values.speed || '-'}m/s</Descriptions.Item>
         <Descriptions.Item label="Motor Tipi">{values.motorType === 1 ? 'MRL (Makine Dairesiz)' : 'MR (Makine Daireli)'}</Descriptions.Item>
-        <Descriptions.Item label="Aski Tipi">{values.suspensionType === 1 ? '1:1 (Dogrudan)' : '2:1 (Makarali)'}</Descriptions.Item>
+        <Descriptions.Item label="Aski Tipi">{values.suspensionType === 1 ? '1:1 (Doğrudan)' : '2:1 (Makaralı)'}</Descriptions.Item>
         <Descriptions.Item label={<><NodeIndexOutlined /> Halat</>}>{values.ropeBrand || '-'} - {values.ropeDiameter || '-'}mm x {values.ropeCount || '-'} adet</Descriptions.Item>
         <Descriptions.Item label={<><SafetyCertificateOutlined /> Regulator</>}>{values.regulatorBrand || '-'}</Descriptions.Item>
-        <Descriptions.Item label={<><ControlOutlined /> Pano</>}>{values.panelBrand || '-'} ({values.installationType === 1 ? 'Hazir' : 'Paralel'})</Descriptions.Item>
+        <Descriptions.Item label={<><ControlOutlined /> Pano</>}>{values.panelBrand || '-'} ({values.installationType === 1 ? 'Hazır' : 'Paralel'})</Descriptions.Item>
         <Descriptions.Item label={<><GatewayOutlined /> Kapi</>}>{values.doorBrand || '-'} - {values.doorWidth || '-'}mm x {values.doorHeight || '-'}mm</Descriptions.Item>
         <Descriptions.Item label={<><ColumnWidthOutlined /> Ray</>}>{values.railBrand || '-'} - {values.railSize || '-'}</Descriptions.Item>
         <Descriptions.Item label={<><ColumnHeightOutlined /> Durak</>}>{values.stopCount || '-'} durak, {values.entranceCount || 1} giris</Descriptions.Item>
@@ -570,8 +570,8 @@ const StepCalculation: React.FC<{
         <div style={{ textAlign: 'center', padding: 40, background: '#fafafa', borderRadius: 8 }}>
           <CalculatorOutlined style={{ fontSize: 48, color: '#1890ff', marginBottom: 16 }} />
           <div style={{ marginBottom: 16 }}>
-            <Title level={4} style={{ marginBottom: 4 }}>Fiyat hesaplamaya hazir</Title>
-            <Text type="secondary">Yukaridaki secimlere gore toplam maliyet hesaplanacaktir</Text>
+            <Title level={4} style={{ marginBottom: 4 }}>Fiyat hesaplamaya hazır</Title>
+            <Text type="secondary">Yukarıdaki seçimlere göre toplam maliyet hesaplanacaktır</Text>
           </div>
           <Button
             type="primary"
@@ -587,7 +587,7 @@ const StepCalculation: React.FC<{
       {calculating && (
         <div style={{ textAlign: 'center', padding: 40 }}>
           <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
-          <div style={{ marginTop: 16 }}>Fiyat hesaplaniyor...</div>
+          <div style={{ marginTop: 16 }}>Fiyat hesaplanıyor...</div>
         </div>
       )}
 
@@ -629,7 +629,7 @@ const StepCalculation: React.FC<{
             <Descriptions.Item label="Kar Marji">{((result.profitMargin || 0) * 100).toFixed(0)}%</Descriptions.Item>
           </Descriptions>
 
-          <Title level={5}>Fiyat Kirilimi</Title>
+          <Title level={5}>Fiyat Kırılımı</Title>
           <Table
             dataSource={result.breakdown}
             columns={breakdownColumns}

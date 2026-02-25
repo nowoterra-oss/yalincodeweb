@@ -87,7 +87,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
       const result = await configuratorStepsApi.getAll();
       setSteps(result.sort((a, b) => a.sortOrder - b.sortOrder));
     } catch (err: any) {
-      message.error(err?.message || 'Adimlar yuklenemedi');
+      message.error(err?.message || 'Adımlar yüklenemedi');
     } finally {
       setStepsLoading(false);
     }
@@ -99,7 +99,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
       const result = await configuratorStepFieldsApi.getAll(stepId);
       setFields(result.sort((a, b) => a.sortOrder - b.sortOrder));
     } catch (err: any) {
-      message.error(err?.message || 'Alanlar yuklenemedi');
+      message.error(err?.message || 'Alanlar yüklenemedi');
     } finally {
       setFieldsLoading(false);
     }
@@ -161,7 +161,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           isActive: values.isActive ?? true,
         };
         await configuratorStepsApi.update(updateData);
-        message.success('Adim guncellendi');
+        message.success('Adım güncellendi');
       } else {
         const createData: ConfiguratorStepCreateRequest = {
           stepKey: values.stepKey,
@@ -173,13 +173,13 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           sortOrder: values.sortOrder,
         };
         await configuratorStepsApi.create(createData);
-        message.success('Adim olusturuldu');
+        message.success('Adım oluşturuldu');
       }
       setStepModalOpen(false);
       loadSteps();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setStepSaving(false);
     }
@@ -188,14 +188,14 @@ export const ConfiguratorSettingsPage: React.FC = () => {
   const handleDeleteStep = async (step: ConfiguratorStepAdminDto) => {
     try {
       await configuratorStepsApi.delete(step.id);
-      message.success('Adim silindi');
+      message.success('Adım silindi');
       if (selectedStepId === step.id) {
         setSelectedStepId(null);
         setFields([]);
       }
       loadSteps();
     } catch (err: any) {
-      message.error(err?.message || 'Silme basarisiz');
+      message.error(err?.message || 'Silme başarısız');
     }
   };
 
@@ -212,10 +212,10 @@ export const ConfiguratorSettingsPage: React.FC = () => {
         sortOrder: step.sortOrder,
         isActive: checked,
       });
-      message.success(checked ? 'Adim aktif edildi' : 'Adim pasif edildi');
+      message.success(checked ? 'Adım aktif edildi' : 'Adım pasif edildi');
       loadSteps();
     } catch (err: any) {
-      message.error(err?.message || 'Durum guncellenemedi');
+      message.error(err?.message || 'Durum güncellenemedi');
     }
   };
 
@@ -283,7 +283,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           defaultValue: values.defaultValue || undefined,
         };
         await configuratorStepFieldsApi.update(updateData);
-        message.success('Alan guncellendi');
+        message.success('Alan güncellendi');
       } else {
         const createData: ConfiguratorStepFieldCreateRequest = {
           stepId: selectedStepId,
@@ -304,14 +304,14 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           defaultValue: values.defaultValue || undefined,
         };
         await configuratorStepFieldsApi.create(createData);
-        message.success('Alan olusturuldu');
+        message.success('Alan oluşturuldu');
       }
       setFieldModalOpen(false);
       loadFields(selectedStepId);
       loadSteps(); // refresh fieldCount
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setFieldSaving(false);
     }
@@ -325,7 +325,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
       loadFields(selectedStepId);
       loadSteps(); // refresh fieldCount
     } catch (err: any) {
-      message.error(err?.message || 'Silme basarisiz');
+      message.error(err?.message || 'Silme başarısız');
     }
   };
 
@@ -353,7 +353,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
       message.success(checked ? 'Alan aktif edildi' : 'Alan pasif edildi');
       if (selectedStepId) loadFields(selectedStepId);
     } catch (err: any) {
-      message.error(err?.message || 'Durum guncellenemedi');
+      message.error(err?.message || 'Durum güncellenemedi');
     }
   };
 
@@ -367,7 +367,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
       width: 60,
     },
     {
-      title: 'Alan Anahtari',
+      title: 'Alan Anahtarı',
       dataIndex: 'fieldKey',
       key: 'fieldKey',
       width: 160,
@@ -436,7 +436,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
       ),
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: ConfiguratorStepFieldAdminDto) => (
@@ -448,9 +448,9 @@ export const ConfiguratorSettingsPage: React.FC = () => {
             onClick={() => openEditField(record)}
           />
           <Popconfirm
-            title="Bu alani silmek istediginize emin misiniz?"
+            title="Bu alanı silmek istediğinize emin misiniz?"
             okText="Sil"
-            cancelText="Iptal"
+            cancelText="İptal"
             onConfirm={() => handleDeleteField(record)}
           >
             <Button type="text" size="small" danger icon={<DeleteOutlined />} />
@@ -465,8 +465,8 @@ export const ConfiguratorSettingsPage: React.FC = () => {
   return (
     <>
       <PageHeader
-        title="Konfigurator Ayarlari"
-        subtitle="Konfigurator adimlarini ve alanlarini yonetin"
+        title="Konfigüratör Ayarları"
+        subtitle="Konfigüratör adımlarını ve alanlarını yönetin"
         extra={<SettingOutlined style={{ fontSize: 20, color: '#999' }} />}
       />
 
@@ -474,7 +474,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
         {/* Left Panel - Steps List */}
         <Col xs={24} lg={8}>
           <Card
-            title="Konfigurator Adimlari"
+            title="Konfigüratör Adımları"
             extra={
               <Button
                 type="primary"
@@ -482,7 +482,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                 icon={<PlusOutlined />}
                 onClick={openCreateStep}
               >
-                Yeni Adim
+                Yeni Adım
               </Button>
             }
             bodyStyle={{ padding: 0 }}
@@ -493,7 +493,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
               </div>
             ) : steps.length === 0 ? (
               <Empty
-                description="Henuz adim eklenmemis"
+                description="Henüz adım eklenmemiş"
                 style={{ padding: 40 }}
               />
             ) : (
@@ -553,7 +553,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                             {step.stepKey}
                           </Text>
                           <Tag style={{ fontSize: 11, margin: 0 }}>
-                            Sira: {step.sortOrder}
+                            Sıra: {step.sortOrder}
                           </Tag>
                           <Tag
                             color="blue"
@@ -598,9 +598,9 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                           }}
                         />
                         <Popconfirm
-                          title="Bu adimi silmek istediginize emin misiniz?"
+                          title="Bu adımı silmek istediğinize emin misiniz?"
                           okText="Sil"
-                          cancelText="Iptal"
+                          cancelText="İptal"
                           onConfirm={(e) => {
                             e?.stopPropagation();
                             handleDeleteStep(step);
@@ -632,7 +632,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
             <Card>
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="Detaylari goruntulemek icin sol panelden bir adim secin"
+                description="Detayları görüntülemek için sol panelden bir adım seçin"
               />
             </Card>
           ) : (
@@ -659,7 +659,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                     icon={<EditOutlined />}
                     onClick={() => openEditStep(selectedStep)}
                   >
-                    Duzenle
+                    Düzenle
                   </Button>
                 }
                 style={{ marginBottom: 16 }}
@@ -667,21 +667,21 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                 <Row gutter={[16, 12]}>
                   <Col span={12}>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      Adim Anahtari
+                      Adım Anahtarı
                     </Text>
                     <br />
                     <Text code>{selectedStep.stepKey}</Text>
                   </Col>
                   <Col span={12}>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      Sira
+                      Sıra
                     </Text>
                     <br />
                     <Text>{selectedStep.sortOrder}</Text>
                   </Col>
                   <Col span={24}>
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      Aciklama
+                      Açıklama
                     </Text>
                     <br />
                     <Text>{selectedStep.description || '-'}</Text>
@@ -689,7 +689,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                   {selectedStep.infoTitle && (
                     <Col span={24}>
                       <Text type="secondary" style={{ fontSize: 12 }}>
-                        Bilgi Basligi
+                        Bilgi Başlığı
                       </Text>
                       <br />
                       <Text>{selectedStep.infoTitle}</Text>
@@ -698,7 +698,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                   {selectedStep.infoDescription && (
                     <Col span={24}>
                       <Text type="secondary" style={{ fontSize: 12 }}>
-                        Bilgi Aciklamasi
+                        Bilgi Açıklaması
                       </Text>
                       <br />
                       <Text>{selectedStep.infoDescription}</Text>
@@ -728,7 +728,7 @@ export const ConfiguratorSettingsPage: React.FC = () => {
                   loading={fieldsLoading}
                   pagination={false}
                   size="middle"
-                  locale={{ emptyText: 'Bu adima henuz alan eklenmemis' }}
+                  locale={{ emptyText: 'Bu adıma henüz alan eklenmemiş' }}
                   scroll={{ x: 900 }}
                 />
               </Card>
@@ -739,13 +739,13 @@ export const ConfiguratorSettingsPage: React.FC = () => {
 
       {/* Step Modal */}
       <Modal
-        title={editingStep ? 'Adimi Duzenle' : 'Yeni Adim'}
+        title={editingStep ? 'Adımı Düzenle' : 'Yeni Adım'}
         open={stepModalOpen}
         onCancel={() => setStepModalOpen(false)}
         onOk={handleSaveStep}
         confirmLoading={stepSaving}
-        okText={editingStep ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editingStep ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
         width={560}
       >
@@ -753,46 +753,46 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
             <Form.Item
               name="stepKey"
-              label="Adim Anahtari"
-              rules={[{ required: true, message: 'Adim anahtari zorunludur' }]}
-              tooltip="Benzersiz anahtar (orn: motor, rope, door)"
+              label="Adım Anahtarı"
+              rules={[{ required: true, message: 'Adım anahtarı zorunludur' }]}
+              tooltip="Benzersiz anahtar (örn: motor, rope, door)"
             >
-              <Input placeholder="ornek: motor" />
+              <Input placeholder="örnek: motor" />
             </Form.Item>
             <Form.Item
               name="title"
-              label="Baslik"
-              rules={[{ required: true, message: 'Baslik zorunludur' }]}
+              label="Başlık"
+              rules={[{ required: true, message: 'Başlık zorunludur' }]}
             >
-              <Input placeholder="ornek: Motor Secimi" />
+              <Input placeholder="örnek: Motor Secimi" />
             </Form.Item>
           </div>
           <Form.Item
             name="description"
-            label="Aciklama"
-            rules={[{ required: true, message: 'Aciklama zorunludur' }]}
+            label="Açıklama"
+            rules={[{ required: true, message: 'Açıklama zorunludur' }]}
           >
-            <Input.TextArea rows={2} placeholder="Adim aciklamasi" />
+            <Input.TextArea rows={2} placeholder="Adım açıklaması" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
             <Form.Item
               name="icon"
-              label="Ikon"
-              rules={[{ required: true, message: 'Ikon zorunludur' }]}
+              label="İkon"
+              rules={[{ required: true, message: 'İkon zorunludur' }]}
               tooltip="Emoji veya ikon ismi"
             >
-              <Input placeholder="ornek: &#x2699;&#xFE0F;" />
+              <Input placeholder="örnek: &#x2699;&#xFE0F;" />
             </Form.Item>
-            <Form.Item name="sortOrder" label="Siralama">
+            <Form.Item name="sortOrder" label="Sıralama">
               <InputNumber min={0} style={{ width: '100%' }} />
             </Form.Item>
           </div>
           <Divider style={{ margin: '8px 0 16px' }} />
-          <Form.Item name="infoTitle" label="Bilgi Basligi" tooltip="Adim bilgilendirme paneli basligi (opsiyonel)">
-            <Input placeholder="ornek: Motor Hakkinda" />
+          <Form.Item name="infoTitle" label="Bilgi Başlığı" tooltip="Adım bilgilendirme paneli başlığı (opsiyonel)">
+            <Input placeholder="örnek: Motor Hakkinda" />
           </Form.Item>
-          <Form.Item name="infoDescription" label="Bilgi Aciklamasi" tooltip="Adim bilgilendirme paneli aciklamasi (opsiyonel)">
-            <Input.TextArea rows={2} placeholder="Kullaniciya gosterilecek bilgilendirme metni" />
+          <Form.Item name="infoDescription" label="Bilgi Açıklaması" tooltip="Adım bilgilendirme paneli açıklaması (opsiyonel)">
+            <Input.TextArea rows={2} placeholder="Kullanıcıya gösterilecek bilgilendirme metni" />
           </Form.Item>
           {editingStep && (
             <Form.Item name="isActive" label="Aktif" valuePropName="checked">
@@ -804,13 +804,13 @@ export const ConfiguratorSettingsPage: React.FC = () => {
 
       {/* Field Modal */}
       <Modal
-        title={editingField ? 'Alani Duzenle' : 'Yeni Alan'}
+        title={editingField ? 'Alanı Düzenle' : 'Yeni Alan'}
         open={fieldModalOpen}
         onCancel={() => setFieldModalOpen(false)}
         onOk={handleSaveField}
         confirmLoading={fieldSaving}
-        okText={editingField ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editingField ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
         width={700}
       >
@@ -818,23 +818,23 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
             <Form.Item
               name="fieldKey"
-              label="Alan Anahtari"
-              rules={[{ required: true, message: 'Alan anahtari zorunludur' }]}
-              tooltip="Benzersiz anahtar (orn: motorBrand, capacity)"
+              label="Alan Anahtarı"
+              rules={[{ required: true, message: 'Alan anahtarı zorunludur' }]}
+              tooltip="Benzersiz anahtar (örn: motorBrand, capacity)"
             >
-              <Input placeholder="ornek: motorBrand" />
+              <Input placeholder="örnek: motorBrand" />
             </Form.Item>
             <Form.Item
               name="label"
               label="Etiket"
               rules={[{ required: true, message: 'Etiket zorunludur' }]}
             >
-              <Input placeholder="ornek: Motor Markasi" />
+              <Input placeholder="örnek: Motor Markası" />
             </Form.Item>
           </div>
 
           <Form.Item name="tooltip" label="Tooltip">
-            <Input placeholder="Kullaniciya gosterilecek ipucu" />
+            <Input placeholder="Kullanıcıya gösterilecek ipucu" />
           </Form.Item>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
@@ -847,17 +847,17 @@ export const ConfiguratorSettingsPage: React.FC = () => {
             </Form.Item>
             <Form.Item
               name="optionsSource"
-              label="Secenek Kaynagi"
-              tooltip="Dinamik secenekler icin kaynak (orn: motorBrands, capacities)"
+              label="Seçenek Kaynağı"
+              tooltip="Dinamik seçenekler için kaynak (örn: motorBrands, capacities)"
             >
-              <Input placeholder="ornek: motorBrands" />
+              <Input placeholder="örnek: motorBrands" />
             </Form.Item>
           </div>
 
           <Form.Item
             name="staticOptions"
-            label="Statik Secenekler"
-            tooltip='JSON formatinda statik secenekler (orn: [{"label":"MR","value":0}])'
+            label="Statik Seçenekler"
+            tooltip='JSON formatında statik seçenekler (örn: [{"label":"MR","value":0}])'
           >
             <Input.TextArea
               rows={2}
@@ -866,43 +866,43 @@ export const ConfiguratorSettingsPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item name="placeholder" label="Placeholder">
-            <Input placeholder="ornek: Marka seciniz" />
+            <Input placeholder="örnek: Marka seçiniz" />
           </Form.Item>
 
           <Divider style={{ margin: '8px 0 16px' }} />
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="minValue" label="Min Deger">
+            <Form.Item name="minValue" label="Min Değer">
               <InputNumber style={{ width: '100%' }} placeholder="Min" />
             </Form.Item>
-            <Form.Item name="maxValue" label="Max Deger">
+            <Form.Item name="maxValue" label="Max Değer">
               <InputNumber style={{ width: '100%' }} placeholder="Max" />
             </Form.Item>
-            <Form.Item name="stepValue" label="Adim Degeri">
+            <Form.Item name="stepValue" label="Adım Değeri">
               <InputNumber style={{ width: '100%' }} placeholder="Step" />
             </Form.Item>
           </div>
 
           <Form.Item
             name="colSpan"
-            label="Sutun Genisligi (colSpan)"
-            tooltip="Ant Design grid sistemi: 24 sutunluk. 12 = yarim genislik, 24 = tam genislik"
+            label="Sütun Genişliği (colSpan)"
+            tooltip="Ant Design grid sistemi: 24 sütunluk. 12 = yarım genişlik, 24 = tam genişlik"
           >
             <Slider min={1} max={24} marks={{ 6: '6', 8: '8', 12: '12', 16: '16', 24: '24' }} />
           </Form.Item>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="sortOrder" label="Siralama">
+            <Form.Item name="sortOrder" label="Sıralama">
               <InputNumber min={0} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="groupTitle" label="Grup Basligi" tooltip="Ayni gruptaki alanlari gruplamak icin baslik">
-              <Input placeholder="ornek: Halat Ayarlari" />
+            <Form.Item name="groupTitle" label="Grup Başlığı" tooltip="Aynı gruptaki alanları gruplamak için başlık">
+              <Input placeholder="örnek: Halat Ayarları" />
             </Form.Item>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="defaultValue" label="Varsayilan Deger">
-              <Input placeholder="Varsayilan deger" />
+            <Form.Item name="defaultValue" label="Varsayılan Değer">
+              <Input placeholder="Varsayılan değer" />
             </Form.Item>
             <Form.Item
               name="isRequired"

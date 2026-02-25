@@ -18,6 +18,7 @@ export const MaterialsPage: React.FC = () => {
   const [editing, setEditing] = useState<MaterialDetail | null>(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState('');
 
   // Dynamic lookups
   const [categories, setCategories] = useState<LookupValue[]>([]);
@@ -30,7 +31,7 @@ export const MaterialsPage: React.FC = () => {
       const result = await materialsApi.getAll();
       setData(result);
     } catch (err: any) {
-      message.error(err?.message || 'Veriler yuklenemedi');
+      message.error(err?.message || 'Veriler yüklenemedi');
     } finally {
       setLoading(false);
     }
@@ -47,7 +48,7 @@ export const MaterialsPage: React.FC = () => {
       setUnits(uns);
       setCurrencies(curs);
     } catch (err: any) {
-      console.warn('Lookup verileri yuklenemedi:', err?.message);
+      console.warn('Lookup verileri yüklenemedi:', err?.message);
     }
   };
 
@@ -86,7 +87,7 @@ export const MaterialsPage: React.FC = () => {
       });
       setModalOpen(true);
     } catch (err: any) {
-      message.error(err?.message || 'Detay yuklenemedi');
+      message.error(err?.message || 'Detay yüklenemedi');
     }
   };
 
@@ -110,7 +111,7 @@ export const MaterialsPage: React.FC = () => {
           leadTimeDays: values.leadTimeDays || undefined,
           isActive: values.isActive ?? true,
         });
-        message.success('Malzeme guncellendi');
+        message.success('Malzeme güncellendi');
       } else {
         await materialsApi.create({
           code: values.code,
@@ -124,13 +125,13 @@ export const MaterialsPage: React.FC = () => {
           minOrderQuantity: values.minOrderQuantity || undefined,
           leadTimeDays: values.leadTimeDays || undefined,
         });
-        message.success('Malzeme olusturuldu');
+        message.success('Malzeme oluşturuldu');
       }
       setModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setSaving(false);
     }
@@ -139,17 +140,17 @@ export const MaterialsPage: React.FC = () => {
   const handleDelete = (record: MaterialListItem) => {
     Modal.confirm({
       title: 'Malzemeyi Sil',
-      content: `"${record.name}" malzemesini silmek istediginize emin misiniz?`,
+      content: `"${record.name}" malzemesini silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await materialsApi.delete(record.id);
           message.success('Malzeme silindi');
           loadData();
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -161,9 +162,15 @@ export const MaterialsPage: React.FC = () => {
       dataIndex: 'code',
       key: 'code',
       width: 130,
+      sorter: (a: MaterialListItem, b: MaterialListItem) => a.code.localeCompare(b.code),
       render: (text: string) => <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{text}</span>,
     },
-    { title: 'Ad', dataIndex: 'name', key: 'name' },
+    {
+      title: 'Ad',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a: MaterialListItem, b: MaterialListItem) => a.name.localeCompare(b.name),
+    },
     {
       title: 'Kategori',
       dataIndex: 'category',
@@ -178,6 +185,7 @@ export const MaterialsPage: React.FC = () => {
       title: 'Birim Fiyat',
       key: 'unitPrice',
       width: 130,
+      sorter: (a: MaterialListItem, b: MaterialListItem) => a.unitPrice - b.unitPrice,
       render: (_: unknown, record: MaterialListItem) => formatCurrency(record.unitPrice, record.currency),
     },
     {
@@ -186,7 +194,7 @@ export const MaterialsPage: React.FC = () => {
       key: 'currency',
       width: 90,
     },
-    { title: 'Tedarikci', dataIndex: 'supplier', key: 'supplier', width: 140, render: (v: string | null) => v || '-' },
+    { title: 'Tedarikçi', dataIndex: 'supplier', key: 'supplier', width: 140, render: (v: string | null) => v || '-' },
     {
       title: 'Durum',
       dataIndex: 'isActive',
@@ -195,14 +203,15 @@ export const MaterialsPage: React.FC = () => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Fiyat Guncelleme',
+      title: 'Fiyat Güncelleme',
       dataIndex: 'priceUpdatedAt',
       key: 'priceUpdatedAt',
       width: 120,
+      sorter: (a: MaterialListItem, b: MaterialListItem) => new Date(a.priceUpdatedAt).getTime() - new Date(b.priceUpdatedAt).getTime(),
       render: (val: string) => formatDate(val),
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: MaterialListItem) => (
@@ -216,66 +225,79 @@ export const MaterialsPage: React.FC = () => {
 
   return (
     <>
-      <PageHeader title="Malzemeler" subtitle="Malzeme ve birim fiyatlarini yonetin" showAdd addText="Yeni Malzeme" onAdd={openCreate} />
+      <PageHeader title="Malzemeler" subtitle="Malzeme ve birim fiyatlarını yönetin" showAdd addText="Yeni Malzeme" onAdd={openCreate} />
 
       <Alert
         type="info"
         showIcon
         closable
         style={{ marginBottom: 16 }}
-        message="Malzemeler nasil calisir?"
+        message="Malzemeler nasıl çalışır?"
         description={
           <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
-            <li><b>Malzemeler</b>, urunlerin BOM (malzeme listesi) satirlarinda kullanilan hammadde ve isciliklerdir.</li>
-            <li>Her malzemenin <b>birim fiyati</b> ve <b>para birimi</b> vardir; BOM hesaplamasinda bu fiyat kullanilir.</li>
-            <li><b>Kategori</b> secimi malzemeleri gruplar: Sac, Profil, Boya, Iscilik, Fason vb.</li>
-            <li><b>Tedarikci</b> ve <b>tedarik suresi</b> bilgileri satin alma planlamasi icindir.</li>
-            <li>Fiyat degistiginde <b>"Fiyat Guncelleme"</b> tarihi otomatik guncellenir.</li>
+            <li><b>Malzemeler</b>, ürünlerin BOM (malzeme listesi) satırlarında kullanılan hammadde ve işçiliklerdir.</li>
+            <li>Her malzemenin <b>birim fiyatı</b> ve <b>para birimi</b> vardır; BOM hesaplamasında bu fiyat kullanılır.</li>
+            <li><b>Kategori</b> seçimi malzemeleri gruplar: Saç, Profil, Boya, İşçilik, Fason vb.</li>
+            <li><b>Tedarikçi</b> ve <b>tedarik süresi</b> bilgileri satın alma planlaması içindir.</li>
+            <li>Fiyat değiştiğinde <b>"Fiyat Güncelleme"</b> tarihi otomatik güncellenir.</li>
           </ul>
         }
       />
 
+      <div style={{ marginBottom: 16 }}>
+        <Input.Search
+          placeholder="Malzeme ara (kod veya ad)"
+          allowClear
+          onChange={(e) => setSearchText(e.target.value.toLowerCase())}
+          style={{ width: 320 }}
+        />
+      </div>
+
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data.filter(item =>
+          !searchText ||
+          item.name.toLowerCase().includes(searchText) ||
+          item.code.toLowerCase().includes(searchText)
+        )}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayit` }}
+        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayıt` }}
         size="middle"
       />
 
       <Modal
-        title={editing ? 'Malzemeyi Duzenle' : 'Yeni Malzeme'}
+        title={editing ? 'Malzemeyi Düzenle' : 'Yeni Malzeme'}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSave}
         confirmLoading={saving}
-        okText={editing ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editing ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
         width={600}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="code" label="Kod" tooltip="Malzemenin benzersiz stok kodu (orn: SAC-DKP-12)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
-              <Input placeholder="ornek: SAC-DKP-12" />
+            <Form.Item name="code" label="Kod" tooltip="Malzemenin benzersiz stok kodu (örn: SAC-DKP-12)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+              <Input placeholder="örnek: SAC-DKP-12" />
             </Form.Item>
-            <Form.Item name="name" label="Ad" tooltip="Malzemenin tanimlanabilir adi" rules={[{ required: true, message: 'Ad zorunludur' }]}>
-              <Input placeholder="ornek: 1.2mm DKP Sac" />
+            <Form.Item name="name" label="Ad" tooltip="Malzemenin tanımlanabilir adı" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+              <Input placeholder="örnek: 1.2mm DKP Sac" />
             </Form.Item>
           </div>
-          <Form.Item name="description" label="Aciklama" tooltip="Malzeme hakkinda ek detaylar (istege bagli)">
-            <Input.TextArea rows={2} placeholder="Malzeme aciklamasi" />
+          <Form.Item name="description" label="Açıklama" tooltip="Malzeme hakkında ek detaylar (isteğe bağlı)">
+            <Input.TextArea rows={2} placeholder="Malzeme açıklaması" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="category" label="Kategori" tooltip="Malzemenin ait oldugu ana kategori (Sac, Profil, Boya, Iscilik vb.)" rules={[{ required: true }]}>
+            <Form.Item name="category" label="Kategori" tooltip="Malzemenin ait olduğu ana kategori (Saç, Profil, Boya, İşçilik vb.)" rules={[{ required: true }]}>
               <Select>
                 {categories.filter(c => c.isActive).map(c => (
                   <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item name="unit" label="Birim" tooltip="Olcum birimi: kg, metre, metrekare, adet, saat veya takim" rules={[{ required: true, message: 'Birim zorunludur' }]}>
+            <Form.Item name="unit" label="Birim" tooltip="Ölçüm birimi: kg, metre, metrekare, adet, saat veya takım" rules={[{ required: true, message: 'Birim zorunludur' }]}>
               <Select>
                 {units.filter(u => u.isActive).map(u => (
                   <Select.Option key={u.code} value={u.code}>{u.name}</Select.Option>
@@ -284,10 +306,10 @@ export const MaterialsPage: React.FC = () => {
             </Form.Item>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="unitPrice" label="Birim Fiyat" tooltip="1 birim malzemenin alis fiyati" rules={[{ required: true, message: 'Fiyat zorunludur' }]}>
+            <Form.Item name="unitPrice" label="Birim Fiyat" tooltip="1 birim malzemenin alış fiyatı" rules={[{ required: true, message: 'Fiyat zorunludur' }]}>
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="currency" label="Para Birimi" tooltip="Fiyatin gecerli oldugu para birimi" rules={[{ required: true }]}>
+            <Form.Item name="currency" label="Para Birimi" tooltip="Fiyatın geçerli olduğu para birimi" rules={[{ required: true }]}>
               <Select>
                 {currencies.filter(c => c.isActive).map(c => (
                   <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
@@ -295,14 +317,14 @@ export const MaterialsPage: React.FC = () => {
               </Select>
             </Form.Item>
           </div>
-          <Form.Item name="supplier" label="Tedarikci" tooltip="Bu malzemeyi temin ettiginiz firma/kisi">
-            <Input placeholder="Tedarikci adi" />
+          <Form.Item name="supplier" label="Tedarikçi" tooltip="Bu malzemeyi temin ettiğiniz firma/kişi">
+            <Input placeholder="Tedarikçi adı" />
           </Form.Item>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="minOrderQuantity" label="Min. Siparis Miktari" tooltip="Tedarikciden siparis edilebilecek en dusuk miktar">
+            <Form.Item name="minOrderQuantity" label="Min. Sipariş Miktarı" tooltip="Tedarikçiden sipariş edilebilecek en düşük miktar">
               <InputNumber min={0} precision={2} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="leadTimeDays" label="Tedarik Suresi (Gun)" tooltip="Siparis verdikten sonra malzemenin teslim suresi">
+            <Form.Item name="leadTimeDays" label="Tedarik Süresi (Gün)" tooltip="Sipariş verdikten sonra malzemenin teslim süresi">
               <InputNumber min={0} precision={0} style={{ width: '100%' }} />
             </Form.Item>
           </div>

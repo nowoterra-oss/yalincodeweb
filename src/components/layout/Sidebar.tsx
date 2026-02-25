@@ -35,15 +35,15 @@ const moduleMenus: ModuleMenuConfig[] = [
   {
     module: 'Core',
     items: [
-      { key: '/users', icon: <UserOutlined />, label: 'Kullanicilar' },
-      { key: '/company', icon: <BankOutlined />, label: 'Sirket Bilgileri' },
+      { key: '/users', icon: <UserOutlined />, label: 'Kullanıcılar' },
+      { key: '/company', icon: <BankOutlined />, label: 'Şirket Bilgileri' },
     ],
   },
   {
     module: 'Sales',
     items: [
-      { key: '/customers', icon: <TeamOutlined />, label: 'Musteriler' },
-      { key: '/orders', icon: <ShoppingCartOutlined />, label: 'Siparisler' },
+      { key: '/customers', icon: <TeamOutlined />, label: 'Müşteriler' },
+      { key: '/orders', icon: <ShoppingCartOutlined />, label: 'Siparişler' },
       { key: '/quotes', icon: <TagOutlined />, label: 'Teklifler' },
     ],
   },
@@ -51,21 +51,21 @@ const moduleMenus: ModuleMenuConfig[] = [
     module: 'Finance',
     items: [
       { key: '/invoices', icon: <DollarOutlined />, label: 'Faturalar' },
-      { key: '/payments', icon: <DollarOutlined />, label: 'Odemeler' },
+      { key: '/payments', icon: <DollarOutlined />, label: 'Ödemeler' },
     ],
   },
   {
     module: 'Procurement',
     items: [
-      { key: '/suppliers', icon: <ShoppingOutlined />, label: 'Tedarikciler' },
-      { key: '/purchase-orders', icon: <ShoppingOutlined />, label: 'Satin Alma' },
+      { key: '/suppliers', icon: <ShoppingOutlined />, label: 'Tedarikçiler' },
+      { key: '/purchase-orders', icon: <ShoppingOutlined />, label: 'Satın Alma' },
     ],
   },
   {
     module: 'Inventory',
     items: [
       { key: '/stock', icon: <InboxOutlined />, label: 'Stok' },
-      { key: '/products', icon: <InboxOutlined />, label: 'Urunler' },
+      { key: '/products', icon: <InboxOutlined />, label: 'Ürünler' },
     ],
   },
   {
@@ -78,15 +78,15 @@ const moduleMenus: ModuleMenuConfig[] = [
   {
     module: 'Planning',
     items: [
-      { key: '/production-plans', icon: <ScheduleOutlined />, label: 'Uretim Plani' },
-      { key: '/work-orders', icon: <ScheduleOutlined />, label: 'Is Emirleri' },
+      { key: '/production-plans', icon: <ScheduleOutlined />, label: 'Üretim Planı' },
+      { key: '/work-orders', icon: <ScheduleOutlined />, label: 'İş Emirleri' },
     ],
   },
   {
     module: 'Engineering',
     items: [
       { key: '/bom', icon: <ToolOutlined />, label: 'BOM' },
-      { key: '/drawings', icon: <ToolOutlined />, label: 'Teknik Cizim' },
+      { key: '/drawings', icon: <ToolOutlined />, label: 'Teknik Çizim' },
     ],
   },
   {
@@ -100,20 +100,20 @@ const moduleMenus: ModuleMenuConfig[] = [
     module: 'Installation',
     items: [
       { key: '/installations', icon: <RocketOutlined />, label: 'Montaj' },
-      { key: '/field-work', icon: <RocketOutlined />, label: 'Saha Isleri' },
+      { key: '/field-work', icon: <RocketOutlined />, label: 'Saha İşleri' },
     ],
   },
   {
     module: 'Pricing',
     items: [
-      { key: '/pricing/product-groups', icon: <TagOutlined />, label: 'Urun Gruplari' },
+      { key: '/pricing/product-groups', icon: <TagOutlined />, label: 'Ürün Grupları' },
       { key: '/pricing/materials', icon: <TagOutlined />, label: 'Malzemeler' },
-      { key: '/pricing/products', icon: <TagOutlined />, label: 'Urunler' },
-      { key: '/pricing/lookups', icon: <SettingOutlined />, label: 'Tanimlar' },
-      { key: '/pricing/supplier-prices', icon: <TagOutlined />, label: 'Tedarikci Fiyatlari' },
-      { key: '/pricing/price-rules', icon: <TagOutlined />, label: 'Fiyat Kurallari' },
-      { key: '/pricing/elevator-configurator', icon: <CalculatorOutlined />, label: 'Asansor Konfiguratoru' },
-      { key: '/pricing/configurator-settings', icon: <SettingOutlined />, label: 'Konfigurator Ayarlari' },
+      { key: '/pricing/products', icon: <TagOutlined />, label: 'Ürünler' },
+      { key: '/pricing/lookups', icon: <SettingOutlined />, label: 'Tanımlar' },
+      { key: '/pricing/supplier-prices', icon: <TagOutlined />, label: 'Tedarikçi Fiyatları' },
+      { key: '/pricing/price-rules', icon: <TagOutlined />, label: 'Fiyat Kuralları' },
+      { key: '/pricing/elevator-configurator', icon: <CalculatorOutlined />, label: 'Asansör Konfigüratörü' },
+      { key: '/pricing/configurator-settings', icon: <SettingOutlined />, label: 'Konfigüratör Ayarları' },
     ],
   },
 ];

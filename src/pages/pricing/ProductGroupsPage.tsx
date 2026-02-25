@@ -18,6 +18,7 @@ export const ProductGroupsPage: React.FC = () => {
   const [editing, setEditing] = useState<ProductGroupDetail | null>(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState('');
 
   const loadData = async () => {
     try {
@@ -25,7 +26,7 @@ export const ProductGroupsPage: React.FC = () => {
       const result = await productGroupsApi.getAll();
       setData(result);
     } catch (err: any) {
-      message.error(err?.message || 'Veriler yuklenemedi');
+      message.error(err?.message || 'Veriler yüklenemedi');
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,7 @@ export const ProductGroupsPage: React.FC = () => {
       });
       setModalOpen(true);
     } catch (err: any) {
-      message.error(err?.message || 'Detay yuklenemedi');
+      message.error(err?.message || 'Detay yüklenemedi');
     }
   };
 
@@ -80,7 +81,7 @@ export const ProductGroupsPage: React.FC = () => {
           sortOrder: values.sortOrder || 0,
           isActive: values.isActive ?? true,
         });
-        message.success('Grup guncellendi');
+        message.success('Grup güncellendi');
       } else {
         await productGroupsApi.create({
           code: values.code,
@@ -91,13 +92,13 @@ export const ProductGroupsPage: React.FC = () => {
           defaultProfitMargin: marginDecimal,
           sortOrder: values.sortOrder || 0,
         });
-        message.success('Grup olusturuldu');
+        message.success('Grup oluşturuldu');
       }
       setModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return; // form validation
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setSaving(false);
     }
@@ -105,22 +106,22 @@ export const ProductGroupsPage: React.FC = () => {
 
   const handleDelete = (record: ProductGroupListItem) => {
     if (record.isSystemGroup) {
-      message.warning('Sistem gruplari silinemez');
+      message.warning('Sistem grupları silinemez');
       return;
     }
     Modal.confirm({
       title: 'Grubu Sil',
-      content: `"${record.name}" grubunu silmek istediginize emin misiniz?`,
+      content: `"${record.name}" grubunu silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await productGroupsApi.delete(record.id);
           message.success('Grup silindi');
           loadData();
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -132,9 +133,15 @@ export const ProductGroupsPage: React.FC = () => {
       dataIndex: 'code',
       key: 'code',
       width: 120,
+      sorter: (a: ProductGroupListItem, b: ProductGroupListItem) => a.code.localeCompare(b.code),
       render: (text: string) => <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{text}</span>,
     },
-    { title: 'Ad', dataIndex: 'name', key: 'name' },
+    {
+      title: 'Ad',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a: ProductGroupListItem, b: ProductGroupListItem) => a.name.localeCompare(b.name),
+    },
     {
       title: 'Icon',
       dataIndex: 'icon',
@@ -143,7 +150,7 @@ export const ProductGroupsPage: React.FC = () => {
       render: (icon: string | null) => icon || '-',
     },
     {
-      title: 'Fiyatlandirma',
+      title: 'Fiyatlandırma',
       dataIndex: 'pricingType',
       key: 'pricingType',
       width: 140,
@@ -154,18 +161,19 @@ export const ProductGroupsPage: React.FC = () => {
       ),
     },
     {
-      title: 'Kar Marji',
+      title: 'Kar Marjı',
       dataIndex: 'defaultProfitMargin',
       key: 'defaultProfitMargin',
       width: 100,
       render: (val: number) => `%${(val * 100).toFixed(0)}`,
     },
     {
-      title: 'Urun',
+      title: 'Ürün',
       dataIndex: 'productCount',
       key: 'productCount',
       width: 70,
       align: 'center' as const,
+      sorter: (a: ProductGroupListItem, b: ProductGroupListItem) => a.productCount - b.productCount,
     },
     {
       title: 'Sistem',
@@ -182,14 +190,15 @@ export const ProductGroupsPage: React.FC = () => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Olusturma',
+      title: 'Oluşturma',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 110,
+      sorter: (a: ProductGroupListItem, b: ProductGroupListItem) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       render: (val: string) => formatDate(val),
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: ProductGroupListItem) => (
@@ -210,67 +219,80 @@ export const ProductGroupsPage: React.FC = () => {
 
   return (
     <>
-      <PageHeader title="Urun Gruplari" subtitle="Fiyatlandirma urun gruplarini yonetin" showAdd addText="Yeni Grup" onAdd={openCreate} />
+      <PageHeader title="Ürün Grupları" subtitle="Fiyatlandırma ürün gruplarını yönetin" showAdd addText="Yeni Grup" onAdd={openCreate} />
 
       <Alert
         type="info"
         showIcon
         closable
         style={{ marginBottom: 16 }}
-        message="Urun gruplari nasil calisir?"
+        message="Ürün grupları nasıl çalışır?"
         description={
           <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
-            <li><b>Urun grubu</b>, benzer urunlerin toplandigi kategoridir (orn: Kabinler, Motorlar, Kapilar).</li>
-            <li><b>BOM tipi</b> gruplarda fiyat, malzeme kirimlari (BOM) uzerinden alttan uste hesaplanir.</li>
-            <li><b>Tedarikci Fiyati</b> tipinde ise fiyat dogrudan tedarikci teklifinden girilir.</li>
-            <li><b>Kar Marji</b>, maliyet uzerine eklenen varsayilan kar oranini belirler.</li>
-            <li>Mor <b>"Sistem"</b> etiketli gruplar seed data'dir ve silinemez; duzenlenebilir.</li>
+            <li><b>Ürün grubu</b>, benzer ürünlerin toplandığı kategoridir (örn: Kabinler, Motorlar, Kapılar).</li>
+            <li><b>BOM tipi</b> gruplarda fiyat, malzeme kırılımları (BOM) üzerinden alttan üste hesaplanır.</li>
+            <li><b>Tedarikçi Fiyatı</b> tipinde ise fiyat doğrudan tedarikçi teklifinden girilir.</li>
+            <li><b>Kar Marjı</b>, maliyet üzerine eklenen varsayılan kar oranını belirler.</li>
+            <li>Mor <b>"Sistem"</b> etiketli gruplar seed data'dır ve silinemez; düzenlenebilir.</li>
           </ul>
         }
       />
 
+      <div style={{ marginBottom: 16 }}>
+        <Input.Search
+          placeholder="Grup ara (kod veya ad)"
+          allowClear
+          onChange={(e) => setSearchText(e.target.value.toLowerCase())}
+          style={{ width: 320 }}
+        />
+      </div>
+
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data.filter(item =>
+          !searchText ||
+          item.name.toLowerCase().includes(searchText) ||
+          item.code.toLowerCase().includes(searchText)
+        )}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayit` }}
+        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayıt` }}
         size="middle"
       />
 
       <Modal
-        title={editing ? 'Grubu Duzenle' : 'Yeni Grup'}
+        title={editing ? 'Grubu Düzenle' : 'Yeni Grup'}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSave}
         confirmLoading={saving}
-        okText={editing ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editing ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="code" label="Kod" tooltip="Grubun benzersiz kisa kodu (orn: cabins, doors)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
-            <Input placeholder="ornek: cabins" />
+          <Form.Item name="code" label="Kod" tooltip="Grubun benzersiz kısa kodu (örn: cabins, doors)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+            <Input placeholder="örnek: cabins" />
           </Form.Item>
-          <Form.Item name="name" label="Ad" tooltip="Grubun kullaniciya gorunen adi" rules={[{ required: true, message: 'Ad zorunludur' }]}>
-            <Input placeholder="ornek: Kabinler" />
+          <Form.Item name="name" label="Ad" tooltip="Grubun kullanıcıya görünen adı" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+            <Input placeholder="örnek: Kabinler" />
           </Form.Item>
-          <Form.Item name="description" label="Aciklama" tooltip="Grubun detayli aciklamasi (istege bagli)">
-            <Input.TextArea rows={2} placeholder="Grup aciklamasi" />
+          <Form.Item name="description" label="Açıklama" tooltip="Grubun detaylı açıklaması (isteğe bağlı)">
+            <Input.TextArea rows={2} placeholder="Grup açıklaması" />
           </Form.Item>
-          <Form.Item name="icon" label="Icon" tooltip="Grubu temsil eden emoji veya icon adi">
-            <Input placeholder="ornek: 🏗️ veya icon adi" />
+          <Form.Item name="icon" label="Icon" tooltip="Grubu temsil eden emoji veya ikon adı">
+            <Input placeholder="örnek: veya ikon adı" />
           </Form.Item>
-          <Form.Item name="pricingType" label="Fiyatlandirma Tipi" tooltip="BOM: malzeme kirimlariyla maliyet hesabi. Tedarikci: direkt fiyat girisi" rules={[{ required: true }]}>
+          <Form.Item name="pricingType" label="Fiyatlandırma Tipi" tooltip="BOM: malzeme kırılımlarıyla maliyet hesabı. Tedarikçi: direkt fiyat girişi" rules={[{ required: true }]}>
             <Select>
-              <Select.Option value={PricingType.BOM}>BOM (Malzeme Kirimlari)</Select.Option>
-              <Select.Option value={PricingType.SupplierPrice}>Tedarikci Fiyati</Select.Option>
+              <Select.Option value={PricingType.BOM}>BOM (Malzeme Kırılımları)</Select.Option>
+              <Select.Option value={PricingType.SupplierPrice}>Tedarikçi Fiyatı</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item name="defaultProfitMargin" label="Kar Marji (%)" tooltip="Satis fiyatina eklenecek varsayilan kar orani" rules={[{ required: true, message: 'Kar marji zorunludur' }]}>
+          <Form.Item name="defaultProfitMargin" label="Kar Marjı (%)" tooltip="Satış fiyatına eklenecek varsayılan kar oranı" rules={[{ required: true, message: 'Kar marjı zorunludur' }]}>
             <InputNumber min={0} max={100} addonAfter="%" style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item name="sortOrder" label="Siralama" tooltip="Listeleme sirasi (kucuk numara once gosterilir)">
+          <Form.Item name="sortOrder" label="Sıralama" tooltip="Listeleme sırası (küçük numara önce gösterilir)">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
           {editing && (

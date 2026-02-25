@@ -14,6 +14,7 @@ import {
   type VariantDto,
   type BomLineListItem,
   type BomLineCreateRequest,
+  type ProductListItem,
   type MaterialListItem,
   type LookupValue,
   type CostCalculationResult,
@@ -42,7 +43,9 @@ export const ProductDetailPage: React.FC = () => {
   const [materials, setMaterials] = useState<MaterialListItem[]>([]);
   const [currencies, setCurrencies] = useState<LookupValue[]>([]);
   const [units, setUnits] = useState<LookupValue[]>([]);
-  const [allVariants, setAllVariants] = useState<VariantDto[]>([]);
+  const [allProducts, setAllProducts] = useState<ProductListItem[]>([]);
+  const [childVariants, setChildVariants] = useState<VariantDto[]>([]);
+  const [loadingChildVariants, setLoadingChildVariants] = useState(false);
 
   // Cost
   const [costResult, setCostResult] = useState<CostCalculationResult | null>(null);
@@ -55,7 +58,7 @@ export const ProductDetailPage: React.FC = () => {
       const detail = await productsApi.getDetail(id);
       setProduct(detail);
     } catch (err: any) {
-      message.error(err?.message || 'Urun detayi yuklenemedi');
+      message.error(err?.message || 'Ürün detayı yüklenemedi');
     } finally {
       setLoading(false);
     }
@@ -72,33 +75,37 @@ export const ProductDetailPage: React.FC = () => {
       setCurrencies(curs);
       setUnits(uns);
     } catch (err: any) {
-      console.warn('BOM lookup verileri yuklenemedi:', err?.message);
+      console.warn('BOM lookup verileri yüklenemedi:', err?.message);
     }
   };
 
-  const loadAllVariants = async () => {
+  const loadAllProducts = async () => {
     try {
-      const allProducts = await productsApi.getAll();
-      const variants: VariantDto[] = [];
-      for (const p of allProducts) {
-        const detail = await productsApi.getDetail(p.id);
-        if (detail.variants) {
-          variants.push(...detail.variants.map(v => ({
-            ...v,
-            name: `${p.name} - ${v.name}`,
-          })));
-        }
-      }
-      setAllVariants(variants);
+      const prods = await productsApi.getAll();
+      setAllProducts(prods);
     } catch (err: any) {
-      console.warn('Varyant listesi yuklenemedi:', err?.message);
+      console.warn('Ürün listesi yüklenemedi:', err?.message);
+    }
+  };
+
+  const handleChildProductSelect = async (productId: string) => {
+    try {
+      setLoadingChildVariants(true);
+      setChildVariants([]);
+      bomForm.setFieldValue('childProductVariantId', undefined);
+      const detail = await productsApi.getDetail(productId);
+      setChildVariants(detail.variants || []);
+    } catch (err: any) {
+      message.error('Varyantlar yüklenemedi');
+    } finally {
+      setLoadingChildVariants(false);
     }
   };
 
   useEffect(() => {
     loadData();
     loadBomLookups();
-    loadAllVariants();
+    loadAllProducts();
   }, [id]);
 
   // BOM data loading
@@ -109,7 +116,7 @@ export const ProductDetailPage: React.FC = () => {
       const lines = await bomLinesApi.getAll({ productVariantId: variantId });
       setBomLines(lines);
     } catch (err: any) {
-      message.error(err?.message || 'BOM satirlari yuklenemedi');
+      message.error(err?.message || 'BOM satırları yüklenemedi');
     } finally {
       setBomLoading(false);
     }
@@ -153,7 +160,7 @@ export const ProductDetailPage: React.FC = () => {
           isDefault: values.isDefault || false,
           isActive: values.isActive ?? true,
         });
-        message.success('Varyant guncellendi');
+        message.success('Varyant güncellendi');
       } else {
         await productVariantsApi.create({
           productId: id,
@@ -161,13 +168,13 @@ export const ProductDetailPage: React.FC = () => {
           name: values.name,
           isDefault: values.isDefault || false,
         });
-        message.success('Varyant olusturuldu');
+        message.success('Varyant oluşturuldu');
       }
       setModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setSaving(false);
     }
@@ -175,11 +182,11 @@ export const ProductDetailPage: React.FC = () => {
 
   const handleDeleteVariant = (variant: VariantDto) => {
     Modal.confirm({
-      title: 'Varyanti Sil',
-      content: `"${variant.name}" varyantini silmek istediginize emin misiniz?`,
+      title: 'Varyantı Sil',
+      content: `"${variant.name}" varyantını silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await productVariantsApi.delete(variant.id);
@@ -191,7 +198,7 @@ export const ProductDetailPage: React.FC = () => {
           }
           loadData();
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -251,7 +258,7 @@ export const ProductDetailPage: React.FC = () => {
           childProductVariantId: bomLineType === 'child' ? values.childProductVariantId : undefined,
           isActive: values.isActive ?? true,
         });
-        message.success('BOM satiri guncellendi');
+        message.success('BOM satırı güncellendi');
       } else {
         const createData: BomLineCreateRequest = {
           productVariantId: selectedVariantId,
@@ -260,13 +267,13 @@ export const ProductDetailPage: React.FC = () => {
           childProductVariantId: bomLineType === 'child' ? values.childProductVariantId : undefined,
         };
         await bomLinesApi.create(createData);
-        message.success('BOM satiri eklendi');
+        message.success('BOM satırı eklendi');
       }
       setBomModalOpen(false);
       loadBomLines(selectedVariantId);
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setBomSaving(false);
     }
@@ -274,18 +281,18 @@ export const ProductDetailPage: React.FC = () => {
 
   const handleDeleteBomLine = (line: BomLineListItem) => {
     Modal.confirm({
-      title: 'BOM Satirini Sil',
-      content: `Bu satiri silmek istediginize emin misiniz?`,
+      title: 'BOM Satırını Sil',
+      content: `Bu satırı silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await bomLinesApi.delete(line.id);
-          message.success('BOM satiri silindi');
+          message.success('BOM satırı silindi');
           if (selectedVariantId) loadBomLines(selectedVariantId);
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -298,10 +305,10 @@ export const ProductDetailPage: React.FC = () => {
       setCalculating(true);
       const result = await bomLinesApi.calculateCost(selectedVariantId);
       setCostResult(result);
-      message.success('Maliyet hesaplandi');
+      message.success('Maliyet hesaplandı');
       loadData(); // refresh variant cost cache
     } catch (err: any) {
-      message.error(err?.message || 'Maliyet hesaplanamadi');
+      message.error(err?.message || 'Maliyet hesaplanamadı');
     } finally {
       setCalculating(false);
     }
@@ -310,7 +317,7 @@ export const ProductDetailPage: React.FC = () => {
   if (loading) {
     return (
       <>
-        <PageHeader title="Urun Detayi" showBack />
+        <PageHeader title="Ürün Detayı" showBack />
         <div style={{ textAlign: 'center', padding: 80 }}>
           <Spin size="large" />
         </div>
@@ -321,8 +328,8 @@ export const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <>
-        <PageHeader title="Urun Detayi" showBack />
-        <Card>Urun bulunamadi.</Card>
+        <PageHeader title="Ürün Detayı" showBack />
+        <Card>Ürün bulunamadı.</Card>
       </>
     );
   }
@@ -335,15 +342,16 @@ export const ProductDetailPage: React.FC = () => {
       dataIndex: 'code',
       key: 'code',
       width: 150,
+      sorter: (a: VariantDto, b: VariantDto) => a.code.localeCompare(b.code),
       render: (text: string) => <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{text}</span>,
     },
-    { title: 'Ad', dataIndex: 'name', key: 'name' },
+    { title: 'Ad', dataIndex: 'name', key: 'name', sorter: (a: VariantDto, b: VariantDto) => a.name.localeCompare(b.name) },
     {
-      title: 'Varsayilan',
+      title: 'Varsayılan',
       dataIndex: 'isDefault',
       key: 'isDefault',
       width: 100,
-      render: (val: boolean) => val ? <Tag color="blue">Varsayilan</Tag> : null,
+      render: (val: boolean) => val ? <Tag color="blue">Varsayılan</Tag> : null,
     },
     {
       title: 'Hesaplanan Maliyet',
@@ -352,7 +360,7 @@ export const ProductDetailPage: React.FC = () => {
       render: (_: unknown, record: VariantDto) =>
         record.calculatedCost != null
           ? formatCurrency(record.calculatedCost, record.calculatedCurrency || 'TRY')
-          : <span style={{ color: '#999' }}>Hesaplanmadi</span>,
+          : <span style={{ color: '#999' }}>Hesaplanmadı</span>,
     },
     {
       title: 'Durum',
@@ -362,7 +370,7 @@ export const ProductDetailPage: React.FC = () => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 140,
       render: (_: unknown, record: VariantDto) => (
@@ -387,6 +395,7 @@ export const ProductDetailPage: React.FC = () => {
       dataIndex: 'sortOrder',
       key: 'sortOrder',
       width: 60,
+      sorter: (a: BomLineListItem, b: BomLineListItem) => a.sortOrder - b.sortOrder,
     },
     {
       title: 'Tip',
@@ -412,6 +421,7 @@ export const ProductDetailPage: React.FC = () => {
       dataIndex: 'quantity',
       key: 'quantity',
       width: 80,
+      sorter: (a: BomLineListItem, b: BomLineListItem) => a.quantity - b.quantity,
     },
     {
       title: 'Birim',
@@ -444,7 +454,7 @@ export const ProductDetailPage: React.FC = () => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: BomLineListItem) => (
@@ -474,7 +484,7 @@ export const ProductDetailPage: React.FC = () => {
       render: (val: number) => `${val}%`,
     },
     {
-      title: 'Satir Maliyeti',
+      title: 'Satır Maliyeti',
       key: 'lineCost',
       width: 140,
       render: (_: unknown, record: any) => (
@@ -489,9 +499,6 @@ export const ProductDetailPage: React.FC = () => {
       render: (val: boolean) => val ? <Tag color="purple">Alt Montaj</Tag> : <Tag color="blue">Malzeme</Tag>,
     },
   ];
-
-  // Filter out self-variants for child assembly selection
-  const childVariantOptions = allVariants.filter(v => !product.variants.some(pv => pv.id === v.id));
 
   return (
     <>
@@ -509,13 +516,13 @@ export const ProductDetailPage: React.FC = () => {
         showIcon
         closable
         style={{ marginBottom: 16 }}
-        message="Urun detayi ve varyantlar"
+        message="Ürün detayı ve varyantlar"
         description={
           <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
-            <li><b>Varyant</b>, ayni urunun farkli versiyonlarini temsil eder (orn: paslanmaz, boyali, camli kabin).</li>
-            <li>Her varyanta ayri <b>BOM (malzeme listesi)</b> tanimlanabilir; maliyet varyant bazinda hesaplanir.</li>
-            <li><b>BOM</b> butonuna tiklayarak varyanta ait malzeme listesini goruntuleyebilir ve duzenleyebilirsiniz.</li>
-            <li><b>Maliyet Hesapla</b> ile secili varyanta ait toplam maliyet otomatik hesaplanir.</li>
+            <li><b>Varyant</b>, aynı ürünün farklı versiyonlarını temsil eder (örn: paslanmaz, boyalı, camlı kabin).</li>
+            <li>Her varyanta ayrı <b>BOM (malzeme listesi)</b> tanımlanabilir; maliyet varyant bazında hesaplanır.</li>
+            <li><b>BOM</b> butonuna tıklayarak varyanta ait malzeme listesini görüntüleyebilir ve düzenleyebilirsiniz.</li>
+            <li><b>Maliyet Hesapla</b> ile seçili varyanta ait toplam maliyet otomatik hesaplanır.</li>
           </ul>
         }
       />
@@ -524,7 +531,7 @@ export const ProductDetailPage: React.FC = () => {
         <Descriptions column={{ xs: 1, sm: 2, md: 3 }} size="small">
           <Descriptions.Item label="Kod">{product.code}</Descriptions.Item>
           <Descriptions.Item label="Ad">{product.name}</Descriptions.Item>
-          <Descriptions.Item label="Urun Grubu">
+          <Descriptions.Item label="Ürün Grubu">
             <Tag>{product.productGroupName}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="Alt Montaj">
@@ -535,9 +542,9 @@ export const ProductDetailPage: React.FC = () => {
               {product.isActive ? 'Aktif' : 'Pasif'}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Olusturma">{formatDate(product.createdAt)}</Descriptions.Item>
+          <Descriptions.Item label="Oluşturma">{formatDate(product.createdAt)}</Descriptions.Item>
           {product.description && (
-            <Descriptions.Item label="Aciklama" span={3}>{product.description}</Descriptions.Item>
+            <Descriptions.Item label="Açıklama" span={3}>{product.description}</Descriptions.Item>
           )}
         </Descriptions>
       </Card>
@@ -549,7 +556,7 @@ export const ProductDetailPage: React.FC = () => {
           rowKey="id"
           pagination={false}
           size="middle"
-          locale={{ emptyText: 'Henuz varyant eklenmemis' }}
+          locale={{ emptyText: 'Henüz varyant eklenmemiş' }}
           rowClassName={(record) => record.id === selectedVariantId ? 'ant-table-row-selected' : ''}
         />
       </Card>
@@ -570,7 +577,7 @@ export const ProductDetailPage: React.FC = () => {
                 Maliyet Hesapla
               </Button>
               <Button type="primary" onClick={openCreateBomLine}>
-                Satir Ekle
+                Satır Ekle
               </Button>
             </Space>
           }
@@ -604,31 +611,31 @@ export const ProductDetailPage: React.FC = () => {
             loading={bomLoading}
             pagination={false}
             size="middle"
-            locale={{ emptyText: 'Bu varyanta henuz BOM satiri eklenmemis' }}
+            locale={{ emptyText: 'Bu varyanta henüz BOM satırı eklenmemiş' }}
           />
         </Card>
       )}
 
       {/* Variant Modal */}
       <Modal
-        title={editingVariant ? 'Varyanti Duzenle' : 'Yeni Varyant'}
+        title={editingVariant ? 'Varyantı Düzenle' : 'Yeni Varyant'}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSaveVariant}
         confirmLoading={saving}
-        okText={editingVariant ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editingVariant ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="code" label="Kod" tooltip="Varyant kisa kodu (orn: paslanmaz, boyali, cam)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
-            <Input placeholder="ornek: paslanmaz" />
+          <Form.Item name="code" label="Kod" tooltip="Varyant kısa kodu (örn: paslanmaz, boyalı, cam)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+            <Input placeholder="örnek: paslanmaz" />
           </Form.Item>
-          <Form.Item name="name" label="Ad" tooltip="Varyant adi (orn: Paslanmaz Celik, Boyali, Camli)" rules={[{ required: true, message: 'Ad zorunludur' }]}>
-            <Input placeholder="ornek: Paslanmaz Celik" />
+          <Form.Item name="name" label="Ad" tooltip="Varyant adı (örn: Paslanmaz Çelik, Boyalı, Camlı)" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+            <Input placeholder="örnek: Paslanmaz Çelik" />
           </Form.Item>
-          <Form.Item name="isDefault" valuePropName="checked" tooltip="Teklif olusturulurken bu varyant otomatik secilir">
-            <Checkbox>Varsayilan Varyant</Checkbox>
+          <Form.Item name="isDefault" valuePropName="checked" tooltip="Teklif oluşturulurken bu varyant otomatik seçilir">
+            <Checkbox>Varsayılan Varyant</Checkbox>
           </Form.Item>
           {editingVariant && (
             <Form.Item name="isActive" label="Aktif" valuePropName="checked">
@@ -640,18 +647,18 @@ export const ProductDetailPage: React.FC = () => {
 
       {/* BOM Line Modal */}
       <Modal
-        title={editingBomLine ? 'BOM Satirini Duzenle' : 'Yeni BOM Satiri'}
+        title={editingBomLine ? 'BOM Satırını Düzenle' : 'Yeni BOM Satırı'}
         open={bomModalOpen}
         onCancel={() => setBomModalOpen(false)}
         onOk={handleSaveBomLine}
         confirmLoading={bomSaving}
-        okText={editingBomLine ? 'Guncelle' : 'Ekle'}
-        cancelText="Iptal"
+        okText={editingBomLine ? 'Güncelle' : 'Ekle'}
+        cancelText="İptal"
         destroyOnClose
         width={600}
       >
         <Form form={bomForm} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item label="Satir Tipi">
+          <Form.Item label="Satır Tipi">
             <Radio.Group value={bomLineType} onChange={(e) => setBomLineType(e.target.value)}>
               <Radio.Button value="material">Malzeme</Radio.Button>
               <Radio.Button value="child">Alt Montaj</Radio.Button>
@@ -659,10 +666,10 @@ export const ProductDetailPage: React.FC = () => {
           </Form.Item>
 
           {bomLineType === 'material' ? (
-            <Form.Item name="materialId" label="Malzeme" rules={[{ required: true, message: 'Malzeme seciniz' }]}>
+            <Form.Item name="materialId" label="Malzeme" rules={[{ required: true, message: 'Malzeme seçiniz' }]}>
               <Select
                 showSearch
-                placeholder="Malzeme seciniz"
+                placeholder="Malzeme seçiniz"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
                   (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
@@ -674,24 +681,45 @@ export const ProductDetailPage: React.FC = () => {
               </Select>
             </Form.Item>
           ) : (
-            <Form.Item name="childProductVariantId" label="Alt Montaj Varyanti" rules={[{ required: true, message: 'Varyant seciniz' }]}>
-              <Select
-                showSearch
-                placeholder="Alt montaj varyanti seciniz"
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-                }
-              >
-                {childVariantOptions.filter(v => v.isActive).map(v => (
-                  <Select.Option key={v.id} value={v.id}>{v.name}</Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
+            <>
+              <Form.Item label="Ürün" rules={[{ required: true, message: 'Ürün seçiniz' }]}>
+                <Select
+                  showSearch
+                  placeholder="Ürün seçiniz"
+                  optionFilterProp="children"
+                  onChange={handleChildProductSelect}
+                  filterOption={(input, option) =>
+                    (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                  }
+                >
+                  {allProducts
+                    .filter(p => p.id !== id)
+                    .map(p => (
+                      <Select.Option key={p.id} value={p.id}>{p.code} - {p.name}</Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
+              <Form.Item name="childProductVariantId" label="Varyant" rules={[{ required: true, message: 'Varyant seçiniz' }]}>
+                <Select
+                  showSearch
+                  placeholder={loadingChildVariants ? 'Yükleniyor...' : 'Önce ürün seçiniz'}
+                  loading={loadingChildVariants}
+                  disabled={childVariants.length === 0 && !loadingChildVariants}
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                  }
+                >
+                  {childVariants.filter(v => v.isActive).map(v => (
+                    <Select.Option key={v.id} value={v.id}>{v.name}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
           )}
 
-          <Form.Item name="label" label="Etiket" tooltip="Ozel bir etiket vermek isterseniz (istege bagli)">
-            <Input placeholder="ornek: Ana sac kesim" />
+          <Form.Item name="label" label="Etiket" tooltip="Özel bir etiket vermek isterseniz (isteğe bağlı)">
+            <Input placeholder="örnek: Ana saç kesim" />
           </Form.Item>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
@@ -708,11 +736,11 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="unitPriceOverride" label="Fiyat Override" tooltip="Malzeme fiyati yerine farkli bir fiyat kullanmak icin">
-              <InputNumber min={0} precision={2} style={{ width: '100%' }} placeholder="Bos = malzeme fiyati" />
+            <Form.Item name="unitPriceOverride" label="Fiyat Override" tooltip="Malzeme fiyatı yerine farklı bir fiyat kullanmak için">
+              <InputNumber min={0} precision={2} style={{ width: '100%' }} placeholder="Boş = malzeme fiyatı" />
             </Form.Item>
             <Form.Item name="currencyOverride" label="Para Birimi Override">
-              <Select allowClear placeholder="Bos = malzeme birimi">
+              <Select allowClear placeholder="Boş = malzeme birimi">
                 {currencies.filter(c => c.isActive).map(c => (
                   <Select.Option key={c.code} value={c.code}>{c.name}</Select.Option>
                 ))}
@@ -721,16 +749,16 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-            <Form.Item name="wastePercent" label="Fire %" tooltip="Uretim sirasinda olusan fire orani (0-100)">
+            <Form.Item name="wastePercent" label="Fire %" tooltip="Üretim sırasında oluşan fire oranı (0-100)">
               <InputNumber min={0} max={100} precision={2} style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name="sortOrder" label="Sira" rules={[{ required: true, message: 'Sira zorunludur' }]}>
+            <Form.Item name="sortOrder" label="Sıra" rules={[{ required: true, message: 'Sıra zorunludur' }]}>
               <InputNumber min={0} precision={0} style={{ width: '100%' }} />
             </Form.Item>
           </div>
 
           <Form.Item name="notes" label="Notlar">
-            <Input.TextArea rows={2} placeholder="BOM satiri notu" />
+            <Input.TextArea rows={2} placeholder="BOM satırı notu" />
           </Form.Item>
 
           {editingBomLine && (

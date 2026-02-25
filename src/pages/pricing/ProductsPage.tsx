@@ -21,6 +21,7 @@ export const ProductsPage: React.FC = () => {
   const [editing, setEditing] = useState<ProductDetail | null>(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState('');
 
   const loadData = async () => {
     try {
@@ -32,7 +33,7 @@ export const ProductsPage: React.FC = () => {
       setData(products);
       setGroups(productGroups);
     } catch (err: any) {
-      message.error(err?.message || 'Veriler yuklenemedi');
+      message.error(err?.message || 'Veriler yüklenemedi');
     } finally {
       setLoading(false);
     }
@@ -64,7 +65,7 @@ export const ProductsPage: React.FC = () => {
       });
       setModalOpen(true);
     } catch (err: any) {
-      message.error(err?.message || 'Detay yuklenemedi');
+      message.error(err?.message || 'Detay yüklenemedi');
     }
   };
 
@@ -84,7 +85,7 @@ export const ProductsPage: React.FC = () => {
           sortOrder: values.sortOrder || 0,
           isActive: values.isActive ?? true,
         });
-        message.success('Urun guncellendi');
+        message.success('Ürün güncellendi');
       } else {
         await productsApi.create({
           code: values.code,
@@ -94,13 +95,13 @@ export const ProductsPage: React.FC = () => {
           isSubAssembly: values.isSubAssembly || false,
           sortOrder: values.sortOrder || 0,
         });
-        message.success('Urun olusturuldu');
+        message.success('Ürün oluşturuldu');
       }
       setModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err?.message || 'Islem basarisiz');
+      message.error(err?.message || 'İşlem başarısız');
     } finally {
       setSaving(false);
     }
@@ -108,18 +109,18 @@ export const ProductsPage: React.FC = () => {
 
   const handleDelete = (record: ProductListItem) => {
     Modal.confirm({
-      title: 'Urunu Sil',
-      content: `"${record.name}" urununu silmek istediginize emin misiniz?`,
+      title: 'Ürünü Sil',
+      content: `"${record.name}" ürününü silmek istediğinize emin misiniz?`,
       okText: 'Sil',
       okType: 'danger',
-      cancelText: 'Iptal',
+      cancelText: 'İptal',
       onOk: async () => {
         try {
           await productsApi.delete(record.id);
-          message.success('Urun silindi');
+          message.success('Ürün silindi');
           loadData();
         } catch (err: any) {
-          message.error(err?.message || 'Silme basarisiz');
+          message.error(err?.message || 'Silme başarısız');
         }
       },
     });
@@ -131,11 +132,17 @@ export const ProductsPage: React.FC = () => {
       dataIndex: 'code',
       key: 'code',
       width: 150,
+      sorter: (a: ProductListItem, b: ProductListItem) => a.code.localeCompare(b.code),
       render: (text: string) => <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{text}</span>,
     },
-    { title: 'Ad', dataIndex: 'name', key: 'name' },
     {
-      title: 'Urun Grubu',
+      title: 'Ad',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a: ProductListItem, b: ProductListItem) => a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Ürün Grubu',
       dataIndex: 'productGroupName',
       key: 'productGroupName',
       width: 160,
@@ -154,6 +161,7 @@ export const ProductsPage: React.FC = () => {
       key: 'variantCount',
       width: 80,
       align: 'center' as const,
+      sorter: (a: ProductListItem, b: ProductListItem) => a.variantCount - b.variantCount,
     },
     {
       title: 'Durum',
@@ -163,14 +171,15 @@ export const ProductsPage: React.FC = () => {
       render: (val: boolean) => <Tag color={val ? 'success' : 'default'}>{val ? 'Aktif' : 'Pasif'}</Tag>,
     },
     {
-      title: 'Olusturma',
+      title: 'Oluşturma',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 110,
+      sorter: (a: ProductListItem, b: ProductListItem) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       render: (val: string) => formatDate(val),
     },
     {
-      title: 'Islemler',
+      title: 'İşlemler',
       key: 'actions',
       width: 130,
       render: (_: unknown, record: ProductListItem) => (
@@ -185,31 +194,44 @@ export const ProductsPage: React.FC = () => {
 
   return (
     <>
-      <PageHeader title="Urunler" subtitle="Urun tanimlarini yonetin" showAdd addText="Yeni Urun" onAdd={openCreate} />
+      <PageHeader title="Ürünler" subtitle="Ürün tanımlarını yönetin" showAdd addText="Yeni Ürün" onAdd={openCreate} />
 
       <Alert
         type="info"
         showIcon
         closable
         style={{ marginBottom: 16 }}
-        message="Urunler nasil calisir?"
+        message="Ürünler nasıl çalışır?"
         description={
           <ul style={{ margin: '4px 0 0', paddingLeft: 18, lineHeight: 1.8 }}>
-            <li><b>Urun</b>, bir urun grubuna ait somut bir kalemi temsil eder (orn: "800mm Genis Panel Kabin").</li>
-            <li>Her urun bir <b>urun grubuna</b> baglidir; grubun fiyatlandirma tipi (BOM/Tedarikci) urune de uygulanir.</li>
-            <li><b>Alt Montaj</b> isaretli urunler baska urunlerin BOM'unda parca olarak kullanilabilir.</li>
-            <li>Detaya gitmek icin satirdaki <b>goz ikonuna</b> tiklayin veya satira <b>cift tiklayin</b>.</li>
-            <li>Detay sayfasinda urunun <b>varyantlarini</b> (orn: paslanmaz, boyali, camli) yonetebilirsiniz.</li>
+            <li><b>Ürün</b>, bir ürün grubuna ait somut bir kalemi temsil eder (örn: "800mm Genis Panel Kabin").</li>
+            <li>Her ürün bir <b>ürün grubuna</b> bağlıdır; grubun fiyatlandırma tipi (BOM/Tedarikçi) ürüne de uygulanır.</li>
+            <li><b>Alt Montaj</b> işaretli ürünler başka ürünlerin BOM'unda parça olarak kullanılabilir.</li>
+            <li>Detaya gitmek için satırdaki <b>göz ikonuna</b> tıklayın veya satıra <b>çift tıklayın</b>.</li>
+            <li>Detay sayfasında ürünün <b>varyantlarını</b> (örn: paslanmaz, boyalı, camlı) yönetebilirsiniz.</li>
           </ul>
         }
       />
 
+      <div style={{ marginBottom: 16 }}>
+        <Input.Search
+          placeholder="Ürün ara (kod veya ad)"
+          allowClear
+          onChange={(e) => setSearchText(e.target.value.toLowerCase())}
+          style={{ width: 320 }}
+        />
+      </div>
+
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data.filter(item =>
+          !searchText ||
+          item.name.toLowerCase().includes(searchText) ||
+          item.code.toLowerCase().includes(searchText)
+        )}
         rowKey="id"
         loading={loading}
-        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayit` }}
+        pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `Toplam ${total} kayıt` }}
         size="middle"
         onRow={(record) => ({
           style: { cursor: 'pointer' },
@@ -218,36 +240,36 @@ export const ProductsPage: React.FC = () => {
       />
 
       <Modal
-        title={editing ? 'Urunu Duzenle' : 'Yeni Urun'}
+        title={editing ? 'Ürünü Düzenle' : 'Yeni Ürün'}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSave}
         confirmLoading={saving}
-        okText={editing ? 'Guncelle' : 'Olustur'}
-        cancelText="Iptal"
+        okText={editing ? 'Güncelle' : 'Oluştur'}
+        cancelText="İptal"
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="code" label="Kod" tooltip="Urunun benzersiz kisa kodu (orn: CAB-800-GP)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
-            <Input placeholder="ornek: CAB-800-GP" />
+          <Form.Item name="code" label="Kod" tooltip="Ürünün benzersiz kısa kodu (örn: CAB-800-GP)" rules={[{ required: true, message: 'Kod zorunludur' }]}>
+            <Input placeholder="örnek: CAB-800-GP" />
           </Form.Item>
-          <Form.Item name="name" label="Ad" tooltip="Urunun kullaniciya gorunen adi" rules={[{ required: true, message: 'Ad zorunludur' }]}>
-            <Input placeholder="ornek: 800mm Genis Panel Kabin" />
+          <Form.Item name="name" label="Ad" tooltip="Ürünün kullanıcıya görünen adı" rules={[{ required: true, message: 'Ad zorunludur' }]}>
+            <Input placeholder="örnek: 800mm Genis Panel Kabin" />
           </Form.Item>
-          <Form.Item name="description" label="Aciklama" tooltip="Urun hakkinda detayli bilgi (istege bagli)">
-            <Input.TextArea rows={2} placeholder="Urun aciklamasi" />
+          <Form.Item name="description" label="Açıklama" tooltip="Ürün hakkında detaylı bilgi (isteğe bağlı)">
+            <Input.TextArea rows={2} placeholder="Ürün açıklaması" />
           </Form.Item>
-          <Form.Item name="productGroupId" label="Urun Grubu" tooltip="Urunun ait oldugu fiyatlandirma grubu (orn: Kabinler, Motorlar)" rules={[{ required: true, message: 'Urun grubu zorunludur' }]}>
-            <Select placeholder="Urun grubu secin">
+          <Form.Item name="productGroupId" label="Ürün Grubu" tooltip="Ürünün ait olduğu fiyatlandırma grubu (örn: Kabinler, Motorlar)" rules={[{ required: true, message: 'Ürün grubu zorunludur' }]}>
+            <Select placeholder="Ürün grubu seçin">
               {groups.map((g) => (
                 <Select.Option key={g.id} value={g.id}>{g.name}</Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="isSubAssembly" valuePropName="checked" tooltip="Baska urunlerin icinde kullanilan bir yari mamul ise isaretleyin">
+          <Form.Item name="isSubAssembly" valuePropName="checked" tooltip="Başka ürünlerin içinde kullanılan bir yarı mamul ise işaretleyin">
             <Checkbox>Alt Montaj</Checkbox>
           </Form.Item>
-          <Form.Item name="sortOrder" label="Siralama" tooltip="Listeleme sirasi (kucuk numara once gosterilir)">
+          <Form.Item name="sortOrder" label="Sıralama" tooltip="Listeleme sırası (küçük numara önce gösterilir)">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
           {editing && (
